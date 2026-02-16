@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\UserController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -12,4 +13,11 @@ Route::middleware('guest')->group(function () {
     Route::post('login', [AuthController::class, 'store'])->name('login.store');
 });
 
-Route::post('logout', [AuthController::class, 'destroy'])->middleware('auth')->name('logout');
+Route::middleware('auth')->group(function () {
+    Route::get('logout', [AuthController::class, 'destroy'])->name('logout');
+
+    Route::prefix('/user')->name('user.')->group(function () {
+        // パスワード変更
+        Route::get('/password', [UserController::class, 'password'])->name('password');
+    });
+});

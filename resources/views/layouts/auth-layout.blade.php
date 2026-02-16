@@ -10,7 +10,7 @@
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     @endif
 </head>
-<body class="tw:min-h-screen tw:bg-[#191970] tw:text-white tw:antialiased">
+<body class="tw:min-h-screen tw:bg-[#c3cbe1] tw:text-white tw:antialiased">
     <main class="tw:mx-auto tw:w-full tw:max-w-md">
         {{ $slot }}
     </main>
