@@ -8,7 +8,7 @@
 
 @if (!empty($messages))
     <x-alert type="error">
-        <ul>
+        <ul {{ $attributes->merge() }}>
             @foreach ($messages as $message)
                 <li>{{ $message }}</li>
             @endforeach

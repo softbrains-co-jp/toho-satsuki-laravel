@@ -1,5 +1,5 @@
 <x-auth-layout>
-    <div class="tw:pt-[40px] tw:w-full tw:flex tw:justify-center">
+    <div class="tw:pt-[40px] tw:w-full tw:flex tw:flex-col tw:items-center">
         <livewire:user.password-change />
     </div>
-</x-guest-layout>
+</x-auth-layout>

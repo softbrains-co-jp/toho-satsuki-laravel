@@ -112,4 +112,6 @@ return [
 
     'password_timeout' => env('AUTH_PASSWORD_TIMEOUT', 10800),
 
+    'password_limit_days' => (int) env('PASSWORD_LIMIT', 90),
+
 ];

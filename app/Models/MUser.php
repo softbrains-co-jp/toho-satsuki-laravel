@@ -23,4 +23,18 @@ class MUser extends Authenticatable
     protected $guarded = [
         'id',
     ];
+
+    /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'password' => 'hashed',
+            'date_login' => 'date',
+        ];
+    }
+
 }
