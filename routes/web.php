@@ -3,10 +3,8 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\MainController;
 
-Route::get('/', function () {
-    return view('welcome');
-})->name('home');
 
 Route::middleware('guest')->group(function () {
     Route::get('login', [AuthController::class, 'index'])->name('login');
@@ -20,4 +18,12 @@ Route::middleware('auth')->group(function () {
         // パスワード変更
         Route::get('/password', [UserController::class, 'password'])->name('password');
     });
+
+    Route::name('main.')->group(function () {
+        // パスワード変更
+        Route::get('/', [MainController::class, 'index'])->name('index');
+        Route::get('/k/{kNo}', [MainController::class, 'index'])->name('search-k');
+        Route::get('/m/{mNo}', [MainController::class, 'index'])->name('search-m');
+    });
+
 });

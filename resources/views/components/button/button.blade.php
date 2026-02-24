@@ -6,7 +6,7 @@
 @php
     switch ($size) {
         case 'sm':
-            $class = 'tw:px-[8px] tw:py-[2px] tw:min-w-[50px] tw:rounded-md ';
+            $class = 'tw:px-[8px] tw:py-[0px] tw:min-w-[50px] tw:rounded-md ';
             break;
         default:
             $class = 'tw:px-[20px] tw:py-[0px] tw:min-w-[100px] tw:rounded-md tw-text-center tw-border-none tw-outline-none ';

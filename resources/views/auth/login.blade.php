@@ -20,8 +20,7 @@
             <div class="tw:w-[400px] tw:mt-[10px] tw:flex tw:items-center tw:mx-auto">
                 <div class="tw:w-[7rem]">パスワード: </div>
                 <div class="tw:flex-1">
-                    <x-forms.input
-                        type="password"
+                    <x-forms.input-password
                         id="password"
                         name="password"
                         required

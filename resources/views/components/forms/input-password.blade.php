@@ -5,13 +5,13 @@
 ])
 <div x-data="{ show: false }"
     @class([
-        'tw:relative tw:inline-flex tw:items-center tw:h-[1.8em] tw:bg-transparent',
+        'tw:relative tw:inline-flex tw:items-center tw:h-[1.8em] tw:bg-white tw:rounded-[0.3rem]',
         'tw:w-full' => !$attributes->has('class') || !str_contains($attributes->get('class'), 'tw:w-'),
         $attributes->get('class'),
     ])
 >
     <input :type="show ? 'text' : 'password'" name="{{ $name }}"
-        class="tw:input tw:px-[4px] tw:h-full tw:m-0 tw:bg-white tw:text-black {{ ($is_error ? ' !tw:bg-red-100 ' : '') }}" placeholder="{{ $placeholder }}"
+        class="tw:absolute tw:w-full tw:px-[4px] tw:h-full tw:m-0 tw:bg-white tw:text-black tw:border-0 tw:rounded-[0.3rem] {{ ($is_error ? ' !tw:bg-red-100 ' : '') }}" placeholder="{{ $placeholder }}"
         {{ $attributes->except('class') }}
     >
     <button type="button" @click="show = !show" class="tw:absolute tw:right-[3px] tw:top-[1px] tw:bottom-[1px] tw:px-[6px] tw:text-gray-500 tw:cursor-pointer hover:tw:text-gray-700 tw:bg-transparent tw:border-none tw:flex tw:items-center tw:rounded tw:z-[10]">

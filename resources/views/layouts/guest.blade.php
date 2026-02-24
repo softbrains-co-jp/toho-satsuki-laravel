@@ -6,13 +6,13 @@
 
     <title>{{ config('app.name', 'Laravel') }}</title>
 
-    @if (file_exists(public_path('build/manifest.json')) || file_exists(public_path('hot')))
-        @vite(['resources/css/app.css', 'resources/js/app.js'])
-    @endif
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body class="tw:min-h-screen tw:bg-[#c3cbe1] tw:text-white tw:antialiased">
+<body class="tw:min-h-screen tw:bg-[#191970] tw:text-white tw:antialiased">
     <main class="tw:mx-auto tw:w-full tw:max-w-md">
         {{ $slot }}
     </main>
+    @livewireScripts
+    @stack('scripts')
 </body>
 </html>

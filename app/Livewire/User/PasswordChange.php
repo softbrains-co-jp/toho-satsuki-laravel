@@ -90,19 +90,20 @@ class PasswordChange extends Component
     {
         $muser = Auth::user();
 
-        if (! $muser || ! $muser->pass_set_date) {
+        $passwordSetDate = $muser?->pass_set_date ?? $muser?->set_pass_date ?? null;
+        if (! $muser || ! $passwordSetDate) {
             return false;
         }
 
         $passwordLimitDays = max((int) config('auth.password_limit_days', 90), 0);
         try {
-            $passSetDate = $muser->pass_set_date instanceof Carbon
-                ? $muser->pass_set_date
-                : Carbon::parse($muser->pass_set_date);
+            $passSetDate = $passwordSetDate instanceof Carbon
+                ? $passwordSetDate
+                : Carbon::parse($passwordSetDate);
         } catch (\Throwable) {
             return false;
         }
 
-        return now()->greaterThan($passSetDate->copy()->addDays($passwordLimitDays));
+        return now()->greaterThanOrEqualTo($passSetDate->copy()->addDays($passwordLimitDays));
     }
 }
