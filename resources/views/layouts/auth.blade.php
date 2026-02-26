@@ -41,6 +41,7 @@
         </div>
     </header>
     <main class="tw:w-screen tw:h-[calc(100vh-95px)] tw:relative">
+        <x-toastr-notifications />
         {{ $slot }}
     </main>
     <footer class="tw:h-[20px]">
