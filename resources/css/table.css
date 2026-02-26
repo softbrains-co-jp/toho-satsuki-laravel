@@ -1,0 +1,36 @@
+.satsuki-table {
+    @apply tw:border-separate tw:border-spacing-0 tw:table-fixed;
+}
+
+.satsuki-table th,
+.satsuki-table td {
+    @apply tw:border-0 tw:border-r tw:border-b tw:border-gray-400 tw:px-[5px] tw:py-[1.5px] tw:text-[0.9rem];
+}
+
+.satsuki-table tr:first-child th,
+.satsuki-table tr:first-child td {
+    @apply tw:border-solid tw:border-t tw:border-gray-400;
+}
+
+.satsuki-table:has(thead) tbody tr:first-child th,
+.satsuki-table:has(thead) tbody tr:first-child td {
+    @apply tw:border-t-0;
+}
+
+.satsuki-table tr th:first-child,
+.satsuki-table tr td:first-child {
+    @apply tw:border-solid tw:border-l tw:border-gray-400;
+}
+
+.satsuki-table th {
+    @apply tw:bg-[#323280] tw:font-bold tw:text-left;
+}
+
+.satsuki-table td {
+    @apply tw:bg-[#e1e5f0] tw:font-normal tw:text-black tw:leading-[1.1rem];
+}
+
+.satsuki-table {
+    @apply tw:border-separate tw:border-spacing-0 tw:table-fixed;
+}
+

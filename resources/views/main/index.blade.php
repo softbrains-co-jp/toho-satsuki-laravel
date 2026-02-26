@@ -40,7 +40,10 @@
         <div class="tw:w-full tw:flex-1">
             <div class="tw:px-[calc((100%-1200px)/2)]">
                 <div class="tw:pt-[30px]">
-                    <x-section-title class="tw:mx-auto">お客様基本情報</x-section-title>
+                    <x-section-title>お客様基本情報</x-section-title>
+                    <div class="tw:pt-[30px] tw:pb-[50px]">
+                        <livewire:main.basic-info :kNo="$kNo" />
+                    </div>
                 </div>
             </div>
         </div>
