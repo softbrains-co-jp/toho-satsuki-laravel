@@ -1,4 +1,4 @@
-<div>
+<div wire:poll.{{ $refreshIntervalSeconds }}s="refreshExclusion">
     <table class="satsuki-table tw:w-full">
         <tr>
             <th>GRIP契約コード</th>

@@ -6,6 +6,7 @@ use App\Models\MExclusionNumber;
 use App\Models\TRkk;
 use App\Models\TRko;
 use App\Models\VBasicInfo;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -19,6 +20,7 @@ class MainController extends Controller
         $user = Auth::user();
         $mExclusionNumber = null;
         $isReadOnly = true;
+        $requestNumber = null;
 
         if ($kNo || $mNo) {
             $requestNumber = $kNo;
@@ -36,7 +38,6 @@ class MainController extends Controller
                 return redirect()->route('main.index')->with('error', "データが存在しません。");
             }
 
-
             // 排他処理
             $mExclusionNumber = $this->setExclusion($requestNumber);
 
@@ -47,21 +48,62 @@ class MainController extends Controller
             ->with(compact(
                 'kNo',
                 'mNo',
+                'requestNumber',
                 'mExclusionNumber',
                 'isReadOnly',
             ));
+    }
+
+    public function retainLock(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'request_number' => ['required', 'string', 'max:64'],
+        ]);
+
+        $userId = Auth::id();
+
+        $updated = MExclusionNumber::query()
+            ->where('request_number', $validated['request_number'])
+            ->where('user_id', $userId)
+            ->update([
+                'date_update' => now(),
+            ]);
+
+        return response()->json([
+            'ok' => true,
+            'retained' => ($updated > 0),
+        ]);
+    }
+
+    public function releaseLock(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'request_number' => ['required', 'string', 'max:64'],
+        ]);
+
+        $userId = Auth::id();
+
+        $deleted = MExclusionNumber::query()
+            ->where('request_number', $validated['request_number'])
+            ->where('user_id', $userId)
+            ->delete();
+
+        return response()->json([
+            'ok' => true,
+            'released' => ($deleted > 0),
+        ]);
     }
 
     protected function setExclusion($requestNumber)
     {
         $user = Auth::user();
 
-        $retentionExpire = (int) config('retention.expire', 5);
+        $lockTtlMinutes = (int) config('lock.ttl_minutes', 5);
 
         // 解放忘れと思われるデータを削除
         MExclusionNumber::query()
             ->where('request_number', $requestNumber)
-            ->where('date_update', '<', now()->subMinutes($retentionExpire))
+            ->where('date_update', '<', now()->subMinutes($lockTtlMinutes))
             ->delete();
 
         // 排他データがあるか取得

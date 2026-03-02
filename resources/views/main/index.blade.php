@@ -1,5 +1,8 @@
 <x-auth-layout>
-    <div class="tw:h-full tw:flex tw:flex-col">
+    <div
+        class="tw:h-full tw:flex tw:flex-col"
+        x-data="mainPageTimeout()"
+    >
         <div class="tw:w-full tw:py-[10px] tw:bg-[#323280]">
             <div class="tw:w-[1200px] tw:mx-auto tw:flex tw:justify-between tw:items-center tw:font-bold">
                 <div class="tw:py-1 tw:px-3">
@@ -76,6 +79,122 @@
     </x-dialog>
     @push('scripts')
     <script>
+        function mainPageTimeout() {
+            return {
+                requestNumber: @json((string) ($requestNumber ?? '')),
+                timeoutMinutes: @json((int) config('lock.operation_timeout_minutes', 30)),
+                retentionMinutes: @json(max((int) config('lock.refresh_interval_minutes', 3), 1)),
+                retainUrl: @json(route('main.lock-retain')),
+                releaseUrl: @json(route('main.lock-release')),
+                redirectUrl: @json(route('main.index')),
+                watchEvents: ['scroll', 'resize', 'click', 'contextmenu', 'mousemove', 'wheel', 'keypress', 'touchstart', 'touchend', 'touchmove', 'touchcancel'],
+                listeners: [],
+                timeoutTimerId: null,
+                retentionTimerId: null,
+                timedOut: false,
+                lastOperation: {
+                    type: null,
+                    time: Date.now(),
+                },
+                init() {
+                    if (!this.requestNumber) {
+                        return;
+                    }
+
+                    this.watchEvents.forEach((type) => {
+                        const handler = () => this.updateLastOperation(type);
+                        window.addEventListener(type, handler, { passive: true });
+                        this.listeners.push({ type, handler });
+                    });
+
+                    this.timeoutTimerId = window.setInterval(() => {
+                        const timeoutMsec = this.timeoutMinutes * 60 * 1000;
+                        const timeoutFlag = (Date.now() - this.lastOperation.time) > timeoutMsec;
+
+                        if (!timeoutFlag || this.timedOut) {
+                            return;
+                        }
+
+                        this.handleTimeout();
+                    }, 1000);
+
+                    this.retentionTimerId = window.setInterval(() => {
+                        this.retainLock();
+                    }, this.retentionMinutes * 60 * 1000);
+                },
+                destroy() {
+                    this.clearTimers();
+                    this.listeners.forEach(({ type, handler }) => {
+                        window.removeEventListener(type, handler);
+                    });
+                    this.listeners = [];
+                },
+                clearTimers() {
+                    if (this.timeoutTimerId) {
+                        window.clearInterval(this.timeoutTimerId);
+                        this.timeoutTimerId = null;
+                    }
+
+                    if (this.retentionTimerId) {
+                        window.clearInterval(this.retentionTimerId);
+                        this.retentionTimerId = null;
+                    }
+                },
+                updateLastOperation(type, time = null) {
+                    this.lastOperation.type = type;
+                    this.lastOperation.time = time ?? Date.now();
+console.log('updateLastOperation');
+console.log(this.timeoutMinutes);
+                },
+                csrfToken() {
+                    return document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ?? '';
+                },
+                async postJson(url, payload, options = {}) {
+                    try {
+                        await fetch(url, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': this.csrfToken(),
+                                'X-Requested-With': 'XMLHttpRequest',
+                            },
+                            body: JSON.stringify(payload),
+                            keepalive: !!options.keepalive,
+                        });
+                    } catch (error) {
+                        console.error(error);
+                    }
+                },
+                async retainLock() {
+                    if (!this.requestNumber) {
+                        return;
+                    }
+
+                    await this.postJson(this.retainUrl, {
+                        request_number: this.requestNumber,
+                    });
+                },
+                async releaseLock() {
+                    if (!this.requestNumber) {
+                        return;
+                    }
+
+                    await this.postJson(this.releaseUrl, {
+                        request_number: this.requestNumber,
+                    }, { keepalive: true });
+                },
+                async handleTimeout() {
+                    this.timedOut = true;
+                    this.clearTimers();
+
+                    await this.releaseLock();
+
+                    alert(this.timeoutMinutes + '分未操作のため、回線依頼番号を自動開放します。');
+                    window.location.assign(this.redirectUrl);
+                },
+            };
+        }
+
         function lineRequestSearch() {
             return {
                 kNo: @json((string) request()->route('kNo', '')),

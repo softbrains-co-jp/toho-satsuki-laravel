@@ -1,0 +1,11 @@
+#toast-container.toast-top-center > div {
+    @apply tw:!w-fit;
+}
+
+#toast-container > div {
+    opacity: 1 !important;
+}
+
+.toast-message {
+    @apply tw:whitespace-nowrap tw:mr-[10px];
+}

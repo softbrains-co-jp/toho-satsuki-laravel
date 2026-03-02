@@ -1,5 +1,6 @@
 @import 'tailwindcss' prefix(tw);
 @import '@fortawesome/fontawesome-free/css/all.min.css';
+@plugin "daisyui";
 
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 @source '../../storage/framework/views/*.php';
@@ -30,3 +31,4 @@
 }
 
 @import './table.css';
+@import './toastr.css';
