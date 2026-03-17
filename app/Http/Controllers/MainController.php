@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\MExclusionNumber;
+use App\Models\TRke;
 use App\Models\TRkk;
 use App\Models\TRko;
 use App\Models\VBasicInfo;
@@ -33,8 +34,10 @@ class MainController extends Controller
                 return redirect()->route('main.index')->with('error', "データが存在しません。");
             }
 
+            $tRke = $this->getRke($requestNumber);
+
             // データが存在するかチェックを行う
-            if (!$this->exists($requestNumber)) {
+            if (!$tRke) {
                 return redirect()->route('main.index')->with('error', "データが存在しません。");
             }
 
@@ -51,6 +54,7 @@ class MainController extends Controller
                 'requestNumber',
                 'mExclusionNumber',
                 'isReadOnly',
+                'tRke',
             ));
     }
 
@@ -154,5 +158,14 @@ class MainController extends Controller
             ->where('rke_019', $requestNumber)
             ->exists();
 
+    }
+
+    protected function getRke($requestNumber)
+    {
+        $tRke = TRke::query()
+            ->where('rke_019', $requestNumber)
+            ->first();
+
+        return $tRke;
     }
 }

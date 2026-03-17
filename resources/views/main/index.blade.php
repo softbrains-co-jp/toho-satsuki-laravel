@@ -49,7 +49,7 @@
                 <div>
                     <x-section-title>お客様基本情報</x-section-title>
                     <div class="tw:pt-[25px]">
-                        <livewire:main.basic-info :kNo="$kNo" />
+                        <livewire:main.basic-info :kNo="$kNo" :tRke="$tRke" />
                     </div>
                 </div>
                 <div>
@@ -61,7 +61,13 @@
                 <div x-show="isServiceInfoVisible" x-cloak>
                     <x-section-title>提供サービス情報</x-section-title>
                     <div class="tw:pt-[25px]">
-                        <livewire:main.service-info :kNo="$kNo" />
+                        <livewire:main.service-info :kNo="$kNo" :tRke="$tRke" />
+                    </div>
+                </div>
+                <div x-show="isServiceInfoVisible" x-cloak>
+                    <x-section-title>物件情報</x-section-title>
+                    <div class="tw:pt-[25px]">
+                        <livewire:main.article-info :kNo="$kNo" :tRke="$tRke" />
                     </div>
                 </div>
             </div>

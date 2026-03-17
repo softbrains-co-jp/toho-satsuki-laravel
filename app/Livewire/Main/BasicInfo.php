@@ -10,27 +10,14 @@ use Livewire\Component;
 class BasicInfo extends Component
 {
     public $kNo = null;
-    public $vBasicInfo = null;
+    public $tRke = null;
+    // public $vBasicInfo = null;
     public $refreshIntervalSeconds = 180;
 
     public function mount(): void
     {
         $refreshIntervalMinutes = max((int) config('lock.refresh_interval_minutes', 3), 1);
         $this->refreshIntervalSeconds = $refreshIntervalMinutes * 60;
-
-        if ($this->kNo) {
-            $this->vBasicInfo = VBasicInfo::query()
-                ->with([
-                    'mHouseStyle',
-                    'mHouseOwnership',
-                    'mMoveIn',
-                    'mLineSpeed',
-                    'mExistence1_043',
-                    'mExistence1_239',
-                ])
-                ->where('rke_019', $this->kNo)
-                ->first();
-        }
     }
 
     public function refreshExclusion(): void

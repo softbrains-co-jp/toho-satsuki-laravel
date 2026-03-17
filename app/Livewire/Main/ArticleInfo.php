@@ -5,7 +5,7 @@ namespace App\Livewire\Main;
 use App\Models\VServiceInfo;
 use Livewire\Component;
 
-class ServiceInfo extends Component
+class ArticleInfo extends Component
 {
     public $kNo = null;
     public $tRke = null;
@@ -16,6 +16,6 @@ class ServiceInfo extends Component
 
     public function render()
     {
-        return view('livewire.main.service-info');
+        return view('livewire.main.article-info');
     }
 }
