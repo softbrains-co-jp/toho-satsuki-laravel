@@ -3,55 +3,65 @@
         class="tw:h-full tw:flex tw:flex-col"
         x-data="mainPageTimeout()"
     >
-        <div class="tw:w-full tw:py-[10px] tw:bg-[#323280]">
+        <div class="tw:w-full tw:bg-[#323280]">
             <div class="tw:w-[1200px] tw:mx-auto tw:flex tw:justify-between tw:items-center tw:font-bold">
-                <div class="tw:py-1 tw:px-3">
+                <div
+                    class="tw:h-full tw:py-[10px] tw:px-3 tw:cursor-pointer"
+                    :class="{ 'tw:text-[#323280] tw:bg-[#c3cbe1]': isServiceInfoVisible }"
+                    @click="toggleServiceInfo"
+                >
                     サービス・物件情報
                 </div>
-                <div class="tw:py-1 tw:px-3">
+                <div class="tw:h-full tw:py-[10px] tw:px-3 tw:cursor-pointer">
                     設備・工程進捗情報
                 </div>
-                <div class="tw:py-1 tw:px-3">
+                <div class="tw:h-full tw:py-[10px] tw:px-3 tw:cursor-pointer">
                     備考集約
                 </div>
-                <div class="tw:py-1 tw:px-3">
+                <div class="tw:h-full tw:py-[10px] tw:px-3 tw:cursor-pointer">
                     机上設計情報
                 </div>
-                <div class="tw:py-1 tw:px-3">
+                <div class="tw:h-full tw:py-[10px] tw:px-3 tw:cursor-pointer">
                     外線調査情報
                 </div>
-                <div class="tw:py-1 tw:px-3">
+                <div class="tw:h-full tw:py-[10px] tw:px-3 tw:cursor-pointer">
                     工事案件情報
                 </div>
-                <div class="tw:py-1 tw:px-3">
+                <div class="tw:h-full tw:py-[10px] tw:px-3 tw:cursor-pointer">
                     竣工情報
                 </div>
-                <div class="tw:py-1 tw:px-3">
+                <div class="tw:h-full tw:py-[10px] tw:px-3 tw:cursor-pointer">
                     精算情報
                 </div>
-                <div class="tw:py-1 tw:px-3">
+                <div class="tw:h-full tw:py-[10px] tw:px-3 tw:cursor-pointer">
                     使用材料
                 </div>
-                <div class="tw:py-1 tw:px-3">
+                <div class="tw:h-full tw:py-[10px] tw:px-3 tw:cursor-pointer">
                     成果物
                 </div>
-                <div class="tw:py-1 tw:px-3">
+                <div class="tw:h-full tw:py-[10px] tw:px-3 tw:cursor-pointer">
                     対応履歴
                 </div>
             </div>
         </div>
-        <div class="tw:w-full tw:flex-1">
-            <div class="tw:px-[calc((100%-1200px)/2)]">
-                <div class="tw:pt-[30px]">
+        <div class="tw:w-full tw:flex-1 tw:py-[30px] tw:overflow-y-scroll">
+            <div class="tw:flex tw:flex-col tw:gap-y-[50px] tw:px-[calc((100%-1200px)/2)]">
+                <div>
                     <x-section-title>お客様基本情報</x-section-title>
-                    <div class="tw:pt-[30px] tw:pb-[50px]">
+                    <div class="tw:pt-[25px]">
                         <livewire:main.basic-info :kNo="$kNo" />
                     </div>
                 </div>
-                <div class="tw:pt-[30px]">
+                <div>
                     <x-section-title>関連工事情報</x-section-title>
-                    <div class="tw:pt-[30px] tw:pb-[50px]">
+                    <div class="tw:pt-[25px]">
                         <livewire:main.const-relation-info :kNo="$kNo" />
+                    </div>
+                </div>
+                <div x-show="isServiceInfoVisible" x-cloak>
+                    <x-section-title>提供サービス情報</x-section-title>
+                    <div class="tw:pt-[25px]">
+                        <livewire:main.service-info :kNo="$kNo" />
                     </div>
                 </div>
             </div>
@@ -95,6 +105,10 @@
                 redirectUrl: @json(route('main.index')),
                 watchEvents: ['scroll', 'resize', 'click', 'contextmenu', 'mousemove', 'wheel', 'keypress', 'touchstart', 'touchend', 'touchmove', 'touchcancel'],
                 listeners: [],
+                logoutListeners: [],
+                isServiceInfoVisible: false,
+                serviceInfoStorageKey: 'main:service-property-info-visible',
+                logoutUrl: @json(route('logout')),
                 timeoutTimerId: null,
                 retentionTimerId: null,
                 timedOut: false,
@@ -103,6 +117,9 @@
                     time: Date.now(),
                 },
                 init() {
+                    this.restoreServiceInfoVisibility();
+                    this.bindLogoutHandlers();
+
                     if (!this.requestNumber) {
                         return;
                     }
@@ -134,6 +151,72 @@
                         window.removeEventListener(type, handler);
                     });
                     this.listeners = [];
+                    this.logoutListeners.forEach(({ element, event, handler }) => {
+                        element.removeEventListener(event, handler);
+                    });
+                    this.logoutListeners = [];
+                },
+                toggleServiceInfo() {
+                    this.isServiceInfoVisible = !this.isServiceInfoVisible;
+                    this.persistServiceInfoVisibility();
+                },
+                restoreServiceInfoVisibility() {
+                    try {
+                        this.isServiceInfoVisible = window.localStorage.getItem(this.serviceInfoStorageKey) === '1';
+                    } catch (error) {
+                        this.isServiceInfoVisible = false;
+                    }
+                },
+                persistServiceInfoVisibility() {
+                    try {
+                        window.localStorage.setItem(this.serviceInfoStorageKey, this.isServiceInfoVisible ? '1' : '0');
+                    } catch (error) {
+                        // localStorage unavailable
+                    }
+                },
+                clearServiceInfoVisibility() {
+                    this.isServiceInfoVisible = false;
+                    try {
+                        window.localStorage.removeItem(this.serviceInfoStorageKey);
+                    } catch (error) {
+                        // localStorage unavailable
+                    }
+                },
+                isLogoutTarget(url) {
+                    if (!url || !this.logoutUrl) {
+                        return false;
+                    }
+
+                    try {
+                        const target = new URL(url, window.location.origin);
+                        const logout = new URL(this.logoutUrl, window.location.origin);
+                        return target.pathname === logout.pathname;
+                    } catch (error) {
+                        return url === this.logoutUrl;
+                    }
+                },
+                bindLogoutHandlers() {
+                    const handlers = [];
+                    const anchors = Array.from(document.querySelectorAll('a[href]')).filter((anchor) => {
+                        return this.isLogoutTarget(anchor.getAttribute('href'));
+                    });
+                    const forms = Array.from(document.querySelectorAll('form[action]')).filter((form) => {
+                        return this.isLogoutTarget(form.getAttribute('action'));
+                    });
+
+                    anchors.forEach((anchor) => {
+                        const handler = () => this.clearServiceInfoVisibility();
+                        anchor.addEventListener('click', handler);
+                        handlers.push({ element: anchor, event: 'click', handler });
+                    });
+
+                    forms.forEach((form) => {
+                        const handler = () => this.clearServiceInfoVisibility();
+                        form.addEventListener('submit', handler);
+                        handlers.push({ element: form, event: 'submit', handler });
+                    });
+
+                    this.logoutListeners = handlers;
                 },
                 clearTimers() {
                     if (this.timeoutTimerId) {
