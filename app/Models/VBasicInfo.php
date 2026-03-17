@@ -18,4 +18,29 @@ class VBasicInfo extends Model
     {
         return $this->belongsTo('App\Models\MHouseStyle', 'rke_024', 'id');
     }
+
+    public function mHouseOwnership()
+    {
+        return $this->belongsTo('App\Models\MHouseOwnership', 'rke_025', 'id');
+    }
+
+    public function mMoveIn()
+    {
+        return $this->belongsTo('App\Models\MMoveIn', 'rke_044', 'id');
+    }
+
+    public function mLineSpeed()
+    {
+        return $this->belongsTo('App\Models\MLineSpeed', 'rke_174', 'id');
+    }
+
+    public function mExistence1_043()
+    {
+        return $this->belongsTo('App\Models\MExistence1', 'rke_043', 'id');
+    }
+
+    public function mExistence1_239()
+    {
+        return $this->belongsTo('App\Models\MExistence1', 'rke_239', 'id');
+    }
 }

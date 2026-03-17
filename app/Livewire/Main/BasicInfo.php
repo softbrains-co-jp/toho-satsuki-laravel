@@ -22,6 +22,11 @@ class BasicInfo extends Component
             $this->vBasicInfo = VBasicInfo::query()
                 ->with([
                     'mHouseStyle',
+                    'mHouseOwnership',
+                    'mMoveIn',
+                    'mLineSpeed',
+                    'mExistence1_043',
+                    'mExistence1_239',
                 ])
                 ->where('rke_019', $this->kNo)
                 ->first();

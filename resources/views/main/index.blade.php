@@ -48,6 +48,12 @@
                         <livewire:main.basic-info :kNo="$kNo" />
                     </div>
                 </div>
+                <div class="tw:pt-[30px]">
+                    <x-section-title>関連工事情報</x-section-title>
+                    <div class="tw:pt-[30px] tw:pb-[50px]">
+                        <livewire:main.const-relation-info :kNo="$kNo" />
+                    </div>
+                </div>
             </div>
         </div>
         <div class="tw:w-full tw:py-0 tw:bg-[#323280]">
@@ -143,8 +149,6 @@
                 updateLastOperation(type, time = null) {
                     this.lastOperation.type = type;
                     this.lastOperation.time = time ?? Date.now();
-console.log('updateLastOperation');
-console.log(this.timeoutMinutes);
                 },
                 csrfToken() {
                     return document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ?? '';
