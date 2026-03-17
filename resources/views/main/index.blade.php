@@ -4,13 +4,13 @@
         x-data="mainPageTimeout()"
     >
         <div class="tw:w-full tw:bg-[#323280]">
-            <div class="tw:w-[1200px] tw:mx-auto tw:flex tw:justify-between tw:items-center tw:font-bold">
+            <div class="tw:w-[1200px] tw:h-[40px] tw:mx-auto tw:flex tw:justify-between tw:items-center tw:font-bold">
                 <div
-                    class="tw:h-full tw:py-[10px] tw:px-3 tw:cursor-pointer"
+                    class="tw:h-full tw:pt-[15px] tw:leading-[0.9rem] tw:px-3 tw:text-center tw:cursor-pointer"
                     :class="{ 'tw:text-[#323280] tw:bg-[#c3cbe1]': isServiceInfoVisible }"
                     @click="toggleServiceInfo"
                 >
-                    サービス・物件情報
+                    サービス・物件情報<br><i class="fa-solid fa-angle-down tw:text-[#323280]"></i>
                 </div>
                 <div class="tw:h-full tw:py-[10px] tw:px-3 tw:cursor-pointer">
                     設備・工程進捗情報
