@@ -6,40 +6,44 @@
         <div class="tw:w-full tw:bg-[#323280]">
             <div class="tw:w-[1200px] tw:h-[40px] tw:mx-auto tw:flex tw:justify-between tw:items-center tw:font-bold">
                 <div
-                    class="tw:h-full tw:pt-[15px] tw:leading-[0.9rem] tw:px-3 tw:text-center tw:cursor-pointer"
-                    :class="{ 'tw:text-[#323280] tw:bg-[#c3cbe1]': isServiceInfoVisible }"
+                    class="tw:h-full tw:grow tw:pt-[15px] tw:leading-[0.9rem] tw:px-3 tw:text-center tw:cursor-pointer"
+                    :class="{ 'tw:text-[#323280] tw:bg-[#c3cbe1]': isSectionVisible('serviceInfo') }"
                     @click="toggleServiceInfo"
                 >
                     サービス・物件情報<br><i class="fa-solid fa-angle-down tw:text-[#323280]"></i>
                 </div>
-                <div class="tw:h-full tw:py-[10px] tw:px-3 tw:cursor-pointer">
-                    設備・工程進捗情報
+                <div
+                    class="tw:h-full tw:grow tw:pt-[15px] tw:leading-[0.9rem] tw:px-3 tw:text-center tw:cursor-pointer"
+                    :class="{ 'tw:text-[#323280] tw:bg-[#c3cbe1]': isSectionVisible('facilityInfo') }"
+                    @click="toggleFacilityInfo"
+                >
+                    設備・工程進捗情報<br><i class="fa-solid fa-angle-down tw:text-[#323280]"></i>
                 </div>
-                <div class="tw:h-full tw:py-[10px] tw:px-3 tw:cursor-pointer">
+                <div class="tw:h-full tw:grow tw:pt-[15px] tw:leading-[0.9rem] tw:px-3 tw:text-center tw:cursor-pointer">
                     備考集約
                 </div>
-                <div class="tw:h-full tw:py-[10px] tw:px-3 tw:cursor-pointer">
+                <div class="tw:h-full tw:grow tw:pt-[15px] tw:leading-[0.9rem] tw:px-3 tw:text-center tw:cursor-pointer">
                     机上設計情報
                 </div>
-                <div class="tw:h-full tw:py-[10px] tw:px-3 tw:cursor-pointer">
+                <div class="tw:h-full tw:grow tw:pt-[15px] tw:leading-[0.9rem] tw:px-3 tw:text-center tw:cursor-pointer">
                     外線調査情報
                 </div>
-                <div class="tw:h-full tw:py-[10px] tw:px-3 tw:cursor-pointer">
+                <div class="tw:h-full tw:grow tw:pt-[15px] tw:leading-[0.9rem] tw:px-3 tw:text-center tw:cursor-pointer">
                     工事案件情報
                 </div>
-                <div class="tw:h-full tw:py-[10px] tw:px-3 tw:cursor-pointer">
+                <div class="tw:h-full tw:grow tw:pt-[15px] tw:leading-[0.9rem] tw:px-3 tw:text-center tw:cursor-pointer">
                     竣工情報
                 </div>
-                <div class="tw:h-full tw:py-[10px] tw:px-3 tw:cursor-pointer">
+                <div class="tw:h-full tw:grow tw:pt-[15px] tw:leading-[0.9rem] tw:px-3 tw:text-center tw:cursor-pointer">
                     精算情報
                 </div>
-                <div class="tw:h-full tw:py-[10px] tw:px-3 tw:cursor-pointer">
+                <div class="tw:h-full tw:grow tw:pt-[15px] tw:leading-[0.9rem] tw:px-3 tw:text-center tw:cursor-pointer">
                     使用材料
                 </div>
-                <div class="tw:h-full tw:py-[10px] tw:px-3 tw:cursor-pointer">
+                <div class="tw:h-full tw:grow tw:pt-[15px] tw:leading-[0.9rem] tw:px-3 tw:text-center tw:cursor-pointer">
                     成果物
                 </div>
-                <div class="tw:h-full tw:py-[10px] tw:px-3 tw:cursor-pointer">
+                <div class="tw:h-full tw:grow tw:pt-[15px] tw:leading-[0.9rem] tw:px-3 tw:text-center tw:cursor-pointer">
                     対応履歴
                 </div>
             </div>
@@ -52,22 +56,28 @@
                         <livewire:main.basic-info :kNo="$kNo" :tRke="$tRke" />
                     </div>
                 </div>
-                <div>
-                    <x-section-title>関連工事情報</x-section-title>
-                    <div class="tw:pt-[25px]">
-                        <livewire:main.const-relation-info :kNo="$kNo" />
-                    </div>
-                </div>
-                <div x-show="isServiceInfoVisible" x-cloak>
+                <div x-show="isSectionVisible('serviceInfo')" x-cloak>
                     <x-section-title>提供サービス情報</x-section-title>
                     <div class="tw:pt-[25px]">
                         <livewire:main.service-info :kNo="$kNo" :tRke="$tRke" />
                     </div>
                 </div>
-                <div x-show="isServiceInfoVisible" x-cloak>
+                <div x-show="isSectionVisible('serviceInfo')" x-cloak>
                     <x-section-title>物件情報</x-section-title>
                     <div class="tw:pt-[25px]">
                         <livewire:main.article-info :kNo="$kNo" :tRke="$tRke" />
+                    </div>
+                </div>
+                <div x-show="isSectionVisible('facilityInfo')" x-cloak>
+                    <x-section-title>設備情報</x-section-title>
+                    <div class="tw:pt-[25px]">
+                        <livewire:main.facility-info :kNo="$kNo" :tRke="$tRke" />
+                    </div>
+                </div>
+                <div>
+                    <x-section-title>関連工事情報</x-section-title>
+                    <div class="tw:pt-[25px]">
+                        <livewire:main.const-relation-info :kNo="$kNo" />
                     </div>
                 </div>
             </div>
@@ -112,8 +122,14 @@
                 watchEvents: ['scroll', 'resize', 'click', 'contextmenu', 'mousemove', 'wheel', 'keypress', 'touchstart', 'touchend', 'touchmove', 'touchcancel'],
                 listeners: [],
                 logoutListeners: [],
-                isServiceInfoVisible: false,
-                serviceInfoStorageKey: 'main:service-property-info-visible',
+                sectionVisibility: {
+                    serviceInfo: false,
+                    facilityInfo: false,
+                },
+                sectionVisibilityStorageKeys: {
+                    serviceInfo: 'main:service-property-info-visible',
+                    facilityInfo: 'main:facility-progress-info-visible',
+                },
                 logoutUrl: @json(route('logout')),
                 timeoutTimerId: null,
                 retentionTimerId: null,
@@ -123,7 +139,7 @@
                     time: Date.now(),
                 },
                 init() {
-                    this.restoreServiceInfoVisibility();
+                    this.restoreSectionVisibility();
                     this.bindLogoutHandlers();
 
                     if (!this.requestNumber) {
@@ -163,30 +179,67 @@
                     this.logoutListeners = [];
                 },
                 toggleServiceInfo() {
-                    this.isServiceInfoVisible = !this.isServiceInfoVisible;
-                    this.persistServiceInfoVisibility();
+                    this.toggleSectionVisibility('serviceInfo');
                 },
-                restoreServiceInfoVisibility() {
+                toggleFacilityInfo() {
+                    this.toggleSectionVisibility('facilityInfo');
+                },
+                toggleSectionVisibility(sectionKey) {
+                    if (!Object.prototype.hasOwnProperty.call(this.sectionVisibility, sectionKey)) {
+                        return;
+                    }
+
+                    this.sectionVisibility[sectionKey] = !this.sectionVisibility[sectionKey];
+                    this.persistSectionVisibility(sectionKey);
+                },
+                isSectionVisible(sectionKey) {
+                    return !!this.sectionVisibility[sectionKey];
+                },
+                restoreSectionVisibility() {
+                    Object.keys(this.sectionVisibility).forEach((sectionKey) => {
+                        this.restoreSectionVisibilityByKey(sectionKey);
+                    });
+                },
+                restoreSectionVisibilityByKey(sectionKey) {
+                    const storageKey = this.sectionVisibilityStorageKeys[sectionKey];
+                    if (!storageKey) {
+                        this.sectionVisibility[sectionKey] = false;
+                        return;
+                    }
+
                     try {
-                        this.isServiceInfoVisible = window.localStorage.getItem(this.serviceInfoStorageKey) === '1';
+                        this.sectionVisibility[sectionKey] = window.localStorage.getItem(storageKey) === '1';
                     } catch (error) {
-                        this.isServiceInfoVisible = false;
+                        this.sectionVisibility[sectionKey] = false;
                     }
                 },
-                persistServiceInfoVisibility() {
+                persistSectionVisibility(sectionKey) {
+                    const storageKey = this.sectionVisibilityStorageKeys[sectionKey];
+                    if (!storageKey) {
+                        return;
+                    }
+
                     try {
-                        window.localStorage.setItem(this.serviceInfoStorageKey, this.isServiceInfoVisible ? '1' : '0');
+                        window.localStorage.setItem(storageKey, this.sectionVisibility[sectionKey] ? '1' : '0');
                     } catch (error) {
                         // localStorage unavailable
                     }
                 },
-                clearServiceInfoVisibility() {
-                    this.isServiceInfoVisible = false;
-                    try {
-                        window.localStorage.removeItem(this.serviceInfoStorageKey);
-                    } catch (error) {
-                        // localStorage unavailable
-                    }
+                clearSectionVisibility() {
+                    Object.keys(this.sectionVisibility).forEach((sectionKey) => {
+                        this.sectionVisibility[sectionKey] = false;
+                        const storageKey = this.sectionVisibilityStorageKeys[sectionKey];
+
+                        if (!storageKey) {
+                            return;
+                        }
+
+                        try {
+                            window.localStorage.removeItem(storageKey);
+                        } catch (error) {
+                            // localStorage unavailable
+                        }
+                    });
                 },
                 isLogoutTarget(url) {
                     if (!url || !this.logoutUrl) {
@@ -211,13 +264,13 @@
                     });
 
                     anchors.forEach((anchor) => {
-                        const handler = () => this.clearServiceInfoVisibility();
+                        const handler = () => this.clearSectionVisibility();
                         anchor.addEventListener('click', handler);
                         handlers.push({ element: anchor, event: 'click', handler });
                     });
 
                     forms.forEach((form) => {
-                        const handler = () => this.clearServiceInfoVisibility();
+                        const handler = () => this.clearSectionVisibility();
                         form.addEventListener('submit', handler);
                         handlers.push({ element: form, event: 'submit', handler });
                     });

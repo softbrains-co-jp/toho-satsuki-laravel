@@ -4,7 +4,7 @@
 
 .satsuki-table th,
 .satsuki-table td {
-    @apply tw:border-0 tw:border-r tw:border-b tw:border-gray-400 tw:px-[5px] tw:py-[2px] tw:text-[0.9rem];
+    @apply tw:border-0 tw:border-r tw:border-b tw:border-gray-400 tw:px-[5px] tw:py-[2px] tw:text-[0.9rem] tw:break-all;
 }
 
 .satsuki-table tr:first-child th,
