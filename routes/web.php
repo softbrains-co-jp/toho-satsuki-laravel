@@ -24,6 +24,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/', [MainController::class, 'index'])->name('index');
         Route::get('/k/{kNo}', [MainController::class, 'index'])->name('search-k');
         Route::get('/m/{mNo}', [MainController::class, 'index'])->name('search-m');
+        Route::post('/post', [MainController::class, 'post'])->name('post');
         Route::post('/lock/retain', [MainController::class, 'retainLock'])->name('lock-retain');
         Route::post('/lock/release', [MainController::class, 'releaseLock'])->name('lock-release');
     });

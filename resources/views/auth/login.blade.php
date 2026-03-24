@@ -40,4 +40,20 @@
 
         </form>
     </div>
+    @push('scripts')
+    <script>
+        (() => {
+            const keys = [
+                'main:service-property-info-visible',
+                'main:facility-progress-info-visible',
+            ];
+
+            try {
+                keys.forEach((key) => window.localStorage.removeItem(key));
+            } catch (error) {
+                // localStorage unavailable
+            }
+        })();
+    </script>
+    @endpush
 </x-guest-layout>

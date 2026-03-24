@@ -48,60 +48,69 @@
                 </div>
             </div>
         </div>
-        <div class="tw:w-full tw:flex-1 tw:py-[30px] tw:overflow-y-scroll">
-            <div class="tw:flex tw:flex-col tw:gap-y-[50px] tw:px-[calc((100%-1200px)/2)]">
-                <div>
-                    <x-section-title>お客様基本情報</x-section-title>
-                    <div class="tw:pt-[25px]">
-                        <livewire:main.basic-info :kNo="$kNo" :tRke="$tRke" />
+        <form method="post" action="{{ route('main.post') }}" class="tw:flex tw:flex-col tw:flex-1 tw:min-h-0">
+            @csrf
+            <div class="tw:w-full tw:flex-1 tw:min-h-0 tw:py-[30px] tw:overflow-y-scroll">
+                <div class="tw:flex tw:flex-col tw:gap-y-[50px] tw:px-[calc((100%-1200px)/2)]">
+                    <div>
+                        <x-section-title>お客様基本情報</x-section-title>
+                        <div class="tw:pt-[25px]">
+                            <livewire:main.basic-info :kNo="$kNo" :tRke="$tRke" />
+                        </div>
                     </div>
-                </div>
-                <div x-show="isSectionVisible('serviceInfo')" x-cloak>
-                    <x-section-title>提供サービス情報</x-section-title>
-                    <div class="tw:pt-[25px]">
-                        <livewire:main.service-info :kNo="$kNo" :tRke="$tRke" />
+                    <div x-show="isSectionVisible('serviceInfo')" x-cloak>
+                        <x-section-title>提供サービス情報</x-section-title>
+                        <div class="tw:pt-[25px]">
+                            <livewire:main.service-info :kNo="$kNo" :tRke="$tRke" />
+                        </div>
                     </div>
-                </div>
-                <div x-show="isSectionVisible('serviceInfo')" x-cloak>
-                    <x-section-title>物件情報</x-section-title>
-                    <div class="tw:pt-[25px]">
-                        <livewire:main.article-info :kNo="$kNo" :tRke="$tRke" />
+                    <div x-show="isSectionVisible('serviceInfo')" x-cloak>
+                        <x-section-title>物件情報</x-section-title>
+                        <div class="tw:pt-[25px]">
+                            <livewire:main.article-info :kNo="$kNo" :tRke="$tRke" />
+                        </div>
                     </div>
-                </div>
-                <div x-show="isSectionVisible('facilityInfo')" x-cloak>
-                    <x-section-title>設備情報</x-section-title>
-                    <div class="tw:pt-[25px]">
-                        <livewire:main.facility-info :kNo="$kNo" :tRke="$tRke" />
+                    <div x-show="isSectionVisible('facilityInfo')" x-cloak>
+                        <x-section-title>設備情報</x-section-title>
+                        <div class="tw:pt-[25px]">
+                            <livewire:main.facility-info :kNo="$kNo" :tRke="$tRke" />
+                        </div>
                     </div>
-                </div>
-                <div>
-                    <x-section-title>関連工事情報</x-section-title>
-                    <div class="tw:pt-[25px]">
-                        <livewire:main.const-relation-info :kNo="$kNo" />
+                    <div x-show="isSectionVisible('facilityInfo')" x-cloak>
+                        <x-section-title>工程進捗情報</x-section-title>
+                        <div class="tw:pt-[25px]">
+                            <livewire:main.progress-info :kNo="$kNo" :tRke="$tRke" />
+                        </div>
+                    </div>
+                    <div>
+                        <x-section-title>関連工事情報</x-section-title>
+                        <div class="tw:pt-[25px]">
+                            <livewire:main.const-relation-info :kNo="$kNo" />
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-        <div class="tw:w-full tw:py-0 tw:bg-[#323280]">
-            <div class="tw:w-[1200px] tw:mx-auto tw:flex tw:justify-between tw:items-center" x-data="lineRequestSearch()">
-                <div class="tw:py-3 tw:flex tw:gap-x-1 tw:items-center">
-                    <div>回線依頼番号</div>
-                    <x-forms.input class="tw:!w-[150px] tw:h-[30px]" x-model.trim="kNo" maxlength="10" />
-                    <x-button.gray class="tw:!w-[80px]" size="sm" @click="searchK">検索</x-button.gray>
-                    <x-button.gray class="tw:!w-[80px]" size="sm" @click="clearK">クリア</x-button.gray>
-                </div>
-                <div class="tw:py-3 tw:flex tw:gap-x-1 tw:items-center">
-                    <div>工事手配コード</div>
-                    <x-forms.input class="tw:!w-[150px] tw:h-[30px]" x-model.trim="mNo" maxlength="10" />
-                    <x-button.gray class="tw:!w-[80px]" size="sm" @click="searchM">検索</x-button.gray>
-                    <x-button.gray class="tw:!w-[80px]" size="sm" @click="clearM">クリア</x-button.gray>
-                </div>
-                <div class="tw:px-5 tw:py-3 tw:bg-[#c3cbe1] tw:flex tw:gap-x-3 tw:items-center ">
-                    <x-button.red class="tw:!w-[130px]" :disabled="$isReadOnly">更新</x-button.red>
-                    <x-button.red class="tw:!w-[130px]" :disabled="$isReadOnly">件名解放</x-button.red>
+            <div class="tw:w-full tw:py-0 tw:bg-[#323280]">
+                <div class="tw:w-[1200px] tw:mx-auto tw:flex tw:justify-between tw:items-center" x-data="lineRequestSearch()">
+                    <div class="tw:py-3 tw:flex tw:gap-x-1 tw:items-center">
+                        <div>回線依頼番号</div>
+                        <x-forms.input name="kNo" class="tw:!w-[150px] tw:h-[30px]" x-model.trim="kNo" maxlength="10" />
+                        <x-button.gray class="tw:!w-[80px]" size="sm" @click="searchK">検索</x-button.gray>
+                        <x-button.gray class="tw:!w-[80px]" size="sm" @click="clearK">クリア</x-button.gray>
+                    </div>
+                    <div class="tw:py-3 tw:flex tw:gap-x-1 tw:items-center">
+                        <div>工事手配コード</div>
+                        <x-forms.input name="mNo" class="tw:!w-[150px] tw:h-[30px]" x-model.trim="mNo" maxlength="10" />
+                        <x-button.gray class="tw:!w-[80px]" size="sm" @click="searchM">検索</x-button.gray>
+                        <x-button.gray class="tw:!w-[80px]" size="sm" @click="clearM">クリア</x-button.gray>
+                    </div>
+                    <div class="tw:px-5 tw:py-3 tw:bg-[#c3cbe1] tw:flex tw:gap-x-3 tw:items-center ">
+                        <x-button.red type="submit" class="tw:!w-[130px]" :disabled="$isReadOnly">更新</x-button.red>
+                        <x-button.red class="tw:!w-[130px]" :disabled="$isReadOnly">件名解放</x-button.red>
+                    </div>
                 </div>
             </div>
-        </div>
+        </form>
     </div>
     <x-dialog name="sample-dialog" title="確認" close-on-backdrop="false" :show="$isReadOnly && !is_null($mExclusionNumber)" :showCloseButton="true">
         現在、別のユーザが使用しているので更新できません。<br>

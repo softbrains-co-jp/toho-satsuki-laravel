@@ -11,6 +11,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 
@@ -22,6 +23,7 @@ class MainController extends Controller
         $mExclusionNumber = null;
         $isReadOnly = true;
         $requestNumber = null;
+        $tRke = null;
 
         if ($kNo || $mNo) {
             $requestNumber = $kNo;
@@ -56,6 +58,48 @@ class MainController extends Controller
                 'isReadOnly',
                 'tRke',
             ));
+    }
+
+    public function post(Request $request)
+    {
+        $kNo = $request->input('kNo');
+        $mNo = $request->input('mNo');
+
+        if ($kNo || $mNo) {
+            $requestNumber = $kNo;
+
+            // 工事手配コードから回線依頼番号を取得
+            if ($mNo) {
+                $requestNumber = $this->getRequestNumber($mNo);
+            }
+            if (!$requestNumber) {
+                return redirect()->route('main.index')->with('error', "データが存在しません。");
+            }
+
+            $tRke = $this->getRke($requestNumber);
+
+            // データが存在するかチェックを行う
+            if (!$tRke) {
+                return redirect()->route('main.index')->with('error', "データが存在しません。");
+            }
+
+            try {
+                DB::transaction(function () use ($tRke, $request) {
+                    $this->updateRke($tRke, $request->input());
+                });
+            } catch (\Throwable $e) {
+                report($e);
+                return back()->withInput()->with('error', '保存に失敗しました。');
+            }
+
+            if ($kNo) {
+                return redirect()->route('main.search-k', ['kNo' => $kNo])->with('success', "保存しました。");
+            } else {
+                return redirect()->route('main.search-m', ['nNo' => $mNo])->with('success', "保存しました。");
+            }
+        }
+
+        return redirect()->route('main.index');
     }
 
     public function retainLock(Request $request): JsonResponse
@@ -167,5 +211,31 @@ class MainController extends Controller
             ->first();
 
         return $tRke;
+    }
+
+    protected function updateRke($tRke, $input)
+    {
+        if (!($tRke instanceof TRke) || !is_array($input)) {
+            return;
+        }
+        foreach ($input as $key => $value) {
+            if (!is_string($key)) {
+                continue;
+            }
+
+            // rke_XXX のみ更新対象（主キー rke_019 は除外）
+            if (!preg_match('/^rke_\d{3}$/', $key) || $key === 'rke_019') {
+                continue;
+            }
+            if (is_array($value) || is_object($value)) {
+                continue;
+            }
+
+            $tRke->{$key} = $value;
+        }
+
+        if ($tRke->isDirty()) {
+            $tRke->save();
+        }
     }
 }
