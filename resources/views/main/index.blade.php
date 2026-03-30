@@ -19,10 +19,16 @@
                 >
                     設備・工程進捗情報<br><i class="fa-solid fa-angle-down tw:text-[#323280]"></i>
                 </div>
-                <div class="tw:h-full tw:grow tw:pt-[15px] tw:leading-[0.9rem] tw:px-3 tw:text-center tw:cursor-pointer">
+                <div class="tw:h-full tw:grow tw:pt-[15px] tw:leading-[0.9rem] tw:px-3 tw:text-center tw:cursor-pointer"
+                    :class="{ 'tw:text-[#323280] tw:bg-[#c3cbe1]': isSectionVisible('remarksAggregation') }"
+                    @click="toggleRemarksAggregation"
+                >
                     備考集約
                 </div>
-                <div class="tw:h-full tw:grow tw:pt-[15px] tw:leading-[0.9rem] tw:px-3 tw:text-center tw:cursor-pointer">
+                <div class="tw:h-full tw:grow tw:pt-[15px] tw:leading-[0.9rem] tw:px-3 tw:text-center tw:cursor-pointer"
+                    :class="{ 'tw:text-[#323280] tw:bg-[#c3cbe1]': isSectionVisible('deskDesignInfo') }"
+                    @click="toggleDeskDesignInfo"
+                >
                     机上設計情報
                 </div>
                 <div class="tw:h-full tw:grow tw:pt-[15px] tw:leading-[0.9rem] tw:px-3 tw:text-center tw:cursor-pointer">
@@ -88,6 +94,18 @@
                             <livewire:main.const-relation-info :kNo="$kNo" />
                         </div>
                     </div>
+                    <div x-show="isSectionVisible('remarksAggregation')" x-cloak>
+                        <x-section-title>備考集約</x-section-title>
+                        <div class="tw:pt-[25px]">
+                            <livewire:main.remarks-aggregation :kNo="$kNo" :tRke="$tRke" />
+                        </div>
+                    </div>
+                    <div x-show="isSectionVisible('deskDesignInfo')" x-cloak>
+                        <x-section-title>机上設計情報</x-section-title>
+                        <div class="tw:pt-[25px]">
+                            <livewire:main.desk-design-info :kNo="$kNo" :tRke="$tRke" />
+                        </div>
+                    </div>
                 </div>
             </div>
             <div class="tw:w-full tw:py-0 tw:bg-[#323280]">
@@ -134,10 +152,14 @@
                 sectionVisibility: {
                     serviceInfo: false,
                     facilityInfo: false,
+                    remarksAggregation: false,
+                    deskDesignInfo: false,
                 },
                 sectionVisibilityStorageKeys: {
                     serviceInfo: 'main:service-property-info-visible',
                     facilityInfo: 'main:facility-progress-info-visible',
+                    remarksAggregation: 'main:remarks-aggregation-visible',
+                    deskDesignInfo: 'main:desk-design-info-visible',
                 },
                 logoutUrl: @json(route('logout')),
                 timeoutTimerId: null,
@@ -192,6 +214,12 @@
                 },
                 toggleFacilityInfo() {
                     this.toggleSectionVisibility('facilityInfo');
+                },
+                toggleRemarksAggregation() {
+                    this.toggleSectionVisibility('remarksAggregation');
+                },
+                toggleDeskDesignInfo() {
+                    this.toggleSectionVisibility('deskDesignInfo');
                 },
                 toggleSectionVisibility(sectionKey) {
                     if (!Object.prototype.hasOwnProperty.call(this.sectionVisibility, sectionKey)) {

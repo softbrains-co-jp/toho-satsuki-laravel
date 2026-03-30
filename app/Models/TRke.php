@@ -52,6 +52,31 @@ class TRke extends Model
             'rke_238' => 'date:Y/m/d',
     ];
 
+    public function tKik()
+    {
+        return $this->hasOne('App\Models\TKik', 'kik_001', 'rke_019');
+    }
+
+    public function tGck()
+    {
+        return $this->hasOne('App\Models\TGck', 'gck_001', 'rke_019');
+    }
+
+    public function tKhj()
+    {
+        return $this->hasOne('App\Models\TKhj', 'khj_001', 'rke_019');
+    }
+
+    public function tSkk()
+    {
+        return $this->hasOne('App\Models\TSkk', 'skk_001', 'rke_019');
+    }
+
+    public function tKsk()
+    {
+        return $this->hasOne('App\Models\TKsk', 'ksk_001', 'rke_019');
+    }
+
     public function mRke024()
     {
         return $this->belongsTo('App\Models\MHouseStyle', 'rke_024', 'id');

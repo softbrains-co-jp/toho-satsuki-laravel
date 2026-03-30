@@ -3,6 +3,11 @@ import './bootstrap';
 import toastr from 'toastr';
 import 'toastr/build/toastr.min.css';
 
+import flatpickr from 'flatpickr';
+import 'flatpickr/dist/flatpickr.min.css';
+import { Japanese } from "flatpickr/dist/l10n/ja.js";
+flatpickr.localize(Japanese);
+
 // toastr display defaults shared across pages.
 toastr.options = {
     closeButton: true,
