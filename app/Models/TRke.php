@@ -43,6 +43,12 @@ class TRke extends Model
             'rke_109' => 'date:Y/m/d',
             'rke_112' => 'date:Y/m/d',
             'rke_115' => 'date:Y/m/d',
+            'rke_122' => 'date:Y/m/d',
+            'rke_126' => 'date:Y/m/d',
+            'rke_127' => 'date:Y/m/d',
+            'rke_138' => 'date:Y/m/d',
+            'rke_139' => 'date:Y/m/d',
+            'rke_150' => 'date:Y/m/d',
             'rke_151' => 'date:Y/m/d',
             'rke_168' => 'date:Y/m/d',
             'rke_169' => 'date:Y/m/d',
@@ -242,6 +248,21 @@ class TRke extends Model
         return $this->belongsTo('App\Models\MRoad', 'rke_124', 'id');
     }
 
+    public function mRke125()
+    {
+        return $this->belongsTo('App\Models\MSurveyProcessCode', 'rke_125', 'id');
+    }
+
+    public function mRke128()
+    {
+        return $this->belongsTo('App\Models\MSurveyProcessCode', 'rke_128', 'id');
+    }
+
+    public function mRke131()
+    {
+        return $this->belongsTo('App\Models\MSurveyProcessCode', 'rke_131', 'id');
+    }
+
     public function mRke136()
     {
         return $this->belongsTo('App\Models\MIncompatibilityCode', 'rke_136', 'id');
@@ -345,6 +366,31 @@ class TRke extends Model
     public function mRke218()
     {
         return $this->belongsTo('App\Models\MExistence4', 'rke_218', 'id');
+    }
+
+    public function mRke223()
+    {
+        return $this->belongsTo('App\Models\MDesignPhaseNote', 'rke_223', 'id');
+    }
+
+    public function mRke224()
+    {
+        return $this->belongsTo('App\Models\MDesignPhaseNote', 'rke_224', 'id');
+    }
+
+    public function mRke225()
+    {
+        return $this->belongsTo('App\Models\MDesignPhaseNote', 'rke_225', 'id');
+    }
+
+    public function mRke226()
+    {
+        return $this->belongsTo('App\Models\MDesignPhaseNote', 'rke_226', 'id');
+    }
+
+    public function mRke227()
+    {
+        return $this->belongsTo('App\Models\MDesignPhaseNote', 'rke_227', 'id');
     }
 
     public function mRke228()

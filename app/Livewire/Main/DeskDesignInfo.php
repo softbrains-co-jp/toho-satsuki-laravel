@@ -4,11 +4,14 @@ namespace App\Livewire\Main;
 
 use App\Models\MClaimArea;
 use App\Models\MConstDetail;
+use App\Models\MDesignPhaseNote;
 use App\Models\MExistence1;
+use App\Models\MIncompatibilityCode;
 use App\Models\MLineSituation;
 use App\Models\MOpen;
 use App\Models\MReuseImpossible;
 use App\Models\MRoad;
+use App\Models\MSurveyProcessCode;
 use Livewire\Component;
 
 class DeskDesignInfo extends Component
@@ -18,10 +21,13 @@ class DeskDesignInfo extends Component
     public $mCostDetailOptions = [];
     public $mClaimAreaOptions = [];
     public $mExistence1Options = [];
+    public $mIncompatibilityCodeOptions = [];
     public $mLineSituationOptions = [];
     public $mOpenOptions = [];
     public $mReuseImpossibleOptions = [];
     public $mRoadOptions = [];
+    public $mSurveyProcessCodeOptions = [];
+    public $mDesignPhaseNoteOptions = [];
 
     public function mount(): void
     {
@@ -36,6 +42,11 @@ class DeskDesignInfo extends Component
             ->toArray();
 
         $this->mExistence1Options = MExistence1::query()
+            ->orderBy('sort', 'asc')
+            ->pluck('val', 'id')
+            ->toArray();
+
+        $this->mIncompatibilityCodeOptions = MIncompatibilityCode::query()
             ->orderBy('sort', 'asc')
             ->pluck('val', 'id')
             ->toArray();
@@ -56,6 +67,16 @@ class DeskDesignInfo extends Component
             ->toArray();
 
         $this->mRoadOptions = MRoad::query()
+            ->orderBy('sort', 'asc')
+            ->pluck('val', 'id')
+            ->toArray();
+
+        $this->mSurveyProcessCodeOptions = MSurveyProcessCode::query()
+            ->orderBy('sort', 'asc')
+            ->pluck('val', 'id')
+            ->toArray();
+
+        $this->mDesignPhaseNoteOptions = MDesignPhaseNote::query()
             ->orderBy('sort', 'asc')
             ->pluck('val', 'id')
             ->toArray();

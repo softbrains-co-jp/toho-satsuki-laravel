@@ -3,9 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Models\MExclusionNumber;
+use App\Models\TKhj;
+use App\Models\TKik;
+use App\Models\TKsk;
 use App\Models\TRke;
 use App\Models\TRkk;
 use App\Models\TRko;
+use App\Models\TSkk;
 use App\Models\VBasicInfo;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
@@ -85,7 +89,7 @@ class MainController extends Controller
 
             try {
                 DB::transaction(function () use ($tRke, $request) {
-                    $this->updateRke($tRke, $request->input());
+                    $this->updateData($tRke, $request->input());
                 });
             } catch (\Throwable $e) {
                 report($e);
@@ -237,5 +241,165 @@ class MainController extends Controller
         if ($tRke->isDirty()) {
             $tRke->save();
         }
+    }
+
+    protected function updateData(TRke $tRke, array $input): void
+    {
+        $this->updateRke($tRke, $input);
+        $this->updateKik($tRke, $input);
+        $this->updateKhj($tRke, $input);
+        $this->updateSkk($tRke, $input);
+        $this->updateKsk($tRke, $input);
+    }
+
+    protected function updateKik(TRke $tRke, array $input): void
+    {
+        $attributes = $this->extractScopedInput($input, 'kik', 'kik_001');
+
+        if ($attributes === []) {
+            return;
+        }
+
+        $hasNonEmptyValue = collect($attributes)->contains(
+            fn ($value) => !is_null($value) && $value !== ''
+        );
+
+        $tKik = $tRke->tKik;
+
+        if (!$tKik) {
+            if (!$hasNonEmptyValue) {
+                return;
+            }
+
+            $tKik = new TKik();
+            $tKik->kik_001 = $tRke->rke_019;
+        }
+
+        foreach ($attributes as $key => $value) {
+            $tKik->{$key} = $value;
+        }
+
+        if ($tKik->isDirty()) {
+            $tKik->save();
+        }
+    }
+
+    protected function updateKhj(TRke $tRke, array $input): void
+    {
+        $attributes = $this->extractScopedInput($input, 'khj', 'khj_001');
+
+        if ($attributes === []) {
+            return;
+        }
+
+        $hasNonEmptyValue = collect($attributes)->contains(
+            fn ($value) => !is_null($value) && $value !== ''
+        );
+
+        $tKhj = $tRke->tKhj;
+
+        if (!$tKhj) {
+            if (!$hasNonEmptyValue) {
+                return;
+            }
+
+            $tKhj = new TKhj();
+            $tKhj->khj_001 = $tRke->rke_019;
+        }
+
+        foreach ($attributes as $key => $value) {
+            $tKhj->{$key} = $value;
+        }
+
+        if ($tKhj->isDirty()) {
+            $tKhj->save();
+        }
+    }
+
+    protected function updateSkk(TRke $tRke, array $input): void
+    {
+        $attributes = $this->extractScopedInput($input, 'skk', 'skk_001');
+
+        if ($attributes === []) {
+            return;
+        }
+
+        $hasNonEmptyValue = collect($attributes)->contains(
+            fn ($value) => !is_null($value) && $value !== ''
+        );
+
+        $tSkk = $tRke->tSkk;
+
+        if (!$tSkk) {
+            if (!$hasNonEmptyValue) {
+                return;
+            }
+
+            $tSkk = new TSkk();
+            $tSkk->skk_001 = $tRke->rke_019;
+        }
+
+        foreach ($attributes as $key => $value) {
+            $tSkk->{$key} = $value;
+        }
+
+        if ($tSkk->isDirty()) {
+            $tSkk->save();
+        }
+    }
+
+    protected function updateKsk(TRke $tRke, array $input): void
+    {
+        $attributes = $this->extractScopedInput($input, 'ksk', 'ksk_001');
+
+        if ($attributes === []) {
+            return;
+        }
+
+        $hasNonEmptyValue = collect($attributes)->contains(
+            fn ($value) => !is_null($value) && $value !== ''
+        );
+
+        $tKsk = $tRke->tKsk;
+
+        if (!$tKsk) {
+            if (!$hasNonEmptyValue) {
+                return;
+            }
+
+            $tKsk = new TKsk();
+            $tKsk->ksk_001 = $tRke->rke_019;
+        }
+
+        foreach ($attributes as $key => $value) {
+            $tKsk->{$key} = $value;
+        }
+
+        if ($tKsk->isDirty()) {
+            $tKsk->save();
+        }
+    }
+
+    protected function extractScopedInput(array $input, string $prefix, string $primaryKey): array
+    {
+        $attributes = [];
+
+        foreach ($input as $key => $value) {
+            if (!is_string($key)) {
+                continue;
+            }
+
+            if (!preg_match('/^' . preg_quote($prefix, '/') . '_\d{3}$/', $key) || $key === $primaryKey) {
+                continue;
+            }
+
+            if (is_array($value) || is_object($value)) {
+                continue;
+            }
+
+            $attributes[$key] = $value;
+        }
+
+        return $attributes;
     }
 }
