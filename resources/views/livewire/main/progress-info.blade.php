@@ -68,7 +68,7 @@
         </tr>
         <tr>
             <th>連絡希望曜日</th>
-            <td>{{ $tRke?->rke_028?->format('Y/m/d') }}</td>
+            <td>{{ $tRke?->rke_028 }}</td>
             <th>連絡希望時間帯</th>
             <td>{{ $tRke?->rke_029 }}</td>
             <td colspan="4"></td>

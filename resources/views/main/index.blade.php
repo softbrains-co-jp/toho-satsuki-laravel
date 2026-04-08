@@ -31,7 +31,10 @@
                 >
                     机上設計情報
                 </div>
-                <div class="tw:h-full tw:grow tw:pt-[15px] tw:leading-[0.9rem] tw:px-3 tw:text-center tw:cursor-pointer">
+                <div class="tw:h-full tw:grow tw:pt-[15px] tw:leading-[0.9rem] tw:px-3 tw:text-center tw:cursor-pointer"
+                    :class="{ 'tw:text-[#323280] tw:bg-[#c3cbe1]': isSectionVisible('lineSurveyInfo') }"
+                    @click="toggleLineSurveyInfo"
+                >
                     外線調査情報
                 </div>
                 <div class="tw:h-full tw:grow tw:pt-[15px] tw:leading-[0.9rem] tw:px-3 tw:text-center tw:cursor-pointer">
@@ -106,6 +109,12 @@
                             <livewire:main.desk-design-info :kNo="$kNo" :tRke="$tRke" />
                         </div>
                     </div>
+                    <div x-show="isSectionVisible('lineSurveyInfo')" x-cloak>
+                        <x-section-title>外線調査情報</x-section-title>
+                        <div class="tw:pt-[25px]">
+                            <livewire:main.line-survey-info :kNo="$kNo" :tRke="$tRke" />
+                        </div>
+                    </div>
                 </div>
             </div>
             <div class="tw:w-full tw:py-0 tw:bg-[#323280]">
@@ -154,12 +163,14 @@
                     facilityInfo: false,
                     remarksAggregation: false,
                     deskDesignInfo: false,
+                    lineSurveyInfo: false,
                 },
                 sectionVisibilityStorageKeys: {
                     serviceInfo: 'main:service-property-info-visible',
                     facilityInfo: 'main:facility-progress-info-visible',
                     remarksAggregation: 'main:remarks-aggregation-visible',
                     deskDesignInfo: 'main:desk-design-info-visible',
+                    lineSurveyInfo: 'main:line-survey-info-visible',
                 },
                 logoutUrl: @json(route('logout')),
                 timeoutTimerId: null,
@@ -220,6 +231,9 @@
                 },
                 toggleDeskDesignInfo() {
                     this.toggleSectionVisibility('deskDesignInfo');
+                },
+                toggleLineSurveyInfo() {
+                    this.toggleSectionVisibility('lineSurveyInfo');
                 },
                 toggleSectionVisibility(sectionKey) {
                     if (!Object.prototype.hasOwnProperty.call(this.sectionVisibility, sectionKey)) {

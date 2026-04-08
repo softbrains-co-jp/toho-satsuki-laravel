@@ -13,4 +13,11 @@ class TKhj extends Model
 
     // タイムスタンプ無効化
     public $timestamps = false;
+
+    protected $casts = [
+            'khj_004' => 'date:Y/m/d',
+            'khj_026' => 'date:Y/m/d',
+            'khj_028' => 'date:Y/m/d',
+    ];
+
 }
