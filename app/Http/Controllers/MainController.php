@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\MExclusionNumber;
+use App\Models\TGck;
 use App\Models\TKhj;
 use App\Models\TKik;
 use App\Models\TKsk;
@@ -21,8 +22,12 @@ use Illuminate\View\View;
 
 class MainController extends Controller
 {
-    public function index($kNo = null, $mNo = null)
+    public function index(Request $request)
     {
+        // Route parameters are injected positionally; resolve by name to avoid /k and /m mismatches.
+        $kNo = $request->route('kNo');
+        $mNo = $request->route('mNo');
+
         $user = Auth::user();
         $mExclusionNumber = null;
         $isReadOnly = true;
@@ -99,7 +104,7 @@ class MainController extends Controller
             if ($kNo) {
                 return redirect()->route('main.search-k', ['kNo' => $kNo])->with('success', "保存しました。");
             } else {
-                return redirect()->route('main.search-m', ['nNo' => $mNo])->with('success', "保存しました。");
+                return redirect()->route('main.search-m', ['mNo' => $mNo])->with('success', "保存しました。");
             }
         }
 
@@ -211,6 +216,106 @@ class MainController extends Controller
     protected function getRke($requestNumber)
     {
         $tRke = TRke::query()
+            ->with([
+                'tKik',
+                'tGck',
+                'tGck.mGck003',
+                'tGck.mGck012',
+                'tGck.mGck013',
+                'tGck.mGck026',
+                'tGck.mGck028',
+                'tGck.mGck044',
+                'tGck.mGck059',
+                'tGck.mGck064',
+                'tKhj',
+                'tSkk',
+                'tKsk',
+                'mRke024',
+                'mRke025',
+                'mRke043',
+                'mRke044',
+                'mRke052',
+                'mRke053',
+                'mRke054',
+                'mRke055',
+                'mRke056',
+                'mRke057',
+                'mRke058',
+                'mRke059',
+                'mRke060',
+                'mRke063',
+                'mRke064',
+                'mRke068',
+                'mRke069',
+                'mRke070',
+                'mRke071',
+                'mRke072',
+                'mRke079',
+                'mRke082',
+                'mRke083',
+                'mRke086',
+                'mRke087',
+                'mRke088',
+                'mRke091',
+                'mRke111',
+                'mRke114',
+                'mRke117',
+                'mRke119',
+                'mRke123',
+                'mRke124',
+                'mRke125',
+                'mRke128',
+                'mRke131',
+                'mRke134',
+                'mRke135',
+                'mRke136',
+                'mRke140',
+                'mRke145',
+                'mRke146',
+                'mRke147',
+                'mRke148',
+                'mRke149',
+                'mRke174',
+                'mRke188',
+                'mRke189',
+                'mRke192',
+                'mRke193',
+                'mRke195',
+                'mRke205',
+                'mRke206',
+                'mRke207',
+                'mRke208',
+                'mRke209',
+                'mRke210',
+                'mRke211',
+                'mRke212',
+                'mRke213',
+                'mRke216',
+                'mRke217',
+                'mRke218',
+                'mRke223',
+                'mRke224',
+                'mRke225',
+                'mRke226',
+                'mRke227',
+                'mRke228',
+                'mRke230',
+                'mRke231',
+                'mRke232',
+                'mRke233',
+                'mRke234',
+                'mRke235',
+                'mRke236',
+                'mRke239',
+                'mRke240',
+                'mRke243',
+                'mRke244',
+                'mRke247',
+                'mRke249',
+                'mRke250',
+                'mRke251',
+                'mRke275',
+            ])
             ->where('rke_019', $requestNumber)
             ->first();
 
@@ -247,6 +352,7 @@ class MainController extends Controller
     {
         $this->updateRke($tRke, $input);
         $this->updateKik($tRke, $input);
+        $this->updateGck($tRke, $input);
         $this->updateKhj($tRke, $input);
         $this->updateSkk($tRke, $input);
         $this->updateKsk($tRke, $input);
@@ -313,6 +419,38 @@ class MainController extends Controller
 
         if ($tKhj->isDirty()) {
             $tKhj->save();
+        }
+    }
+
+    protected function updateGck(TRke $tRke, array $input): void
+    {
+        $attributes = $this->extractScopedInput($input, 'gck', 'gck_001');
+
+        if ($attributes === []) {
+            return;
+        }
+
+        $hasNonEmptyValue = collect($attributes)->contains(
+            fn ($value) => !is_null($value) && $value !== ''
+        );
+
+        $tGck = $tRke->tGck;
+
+        if (!$tGck) {
+            if (!$hasNonEmptyValue) {
+                return;
+            }
+
+            $tGck = new TGck();
+            $tGck->gck_001 = $tRke->rke_019;
+        }
+
+        foreach ($attributes as $key => $value) {
+            $tGck->{$key} = $value;
+        }
+
+        if ($tGck->isDirty()) {
+            $tGck->save();
         }
     }
 

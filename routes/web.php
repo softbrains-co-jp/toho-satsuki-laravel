@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\MainController;
+use App\Http\Controllers\OutLineHistoryController;
 
 
 Route::middleware('guest')->group(function () {
@@ -27,6 +28,12 @@ Route::middleware('auth')->group(function () {
         Route::post('/post', [MainController::class, 'post'])->name('post');
         Route::post('/lock/retain', [MainController::class, 'retainLock'])->name('lock-retain');
         Route::post('/lock/release', [MainController::class, 'releaseLock'])->name('lock-release');
+    });
+
+    // 外線調査履歴
+    Route::prefix('/out-line-history')->name('out-line-history.')->group(function () {
+        Route::get('/{requestNumber}', [OutLineHistoryController::class, 'index'])->name('index');
+        Route::post('/{requestNumber}/update', [OutLineHistoryController::class, 'update'])->name('update');
     });
 
 });

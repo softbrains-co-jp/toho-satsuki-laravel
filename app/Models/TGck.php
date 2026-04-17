@@ -33,4 +33,44 @@ class TGck extends Model
             'gck_061' => 'date:Y/m/d',
             'gck_063' => 'date:Y/m/d',
     ];
+
+    public function mGck003()
+    {
+        return $this->belongsTo('App\Models\MMerchant', 'gck_003', 'id');
+    }
+
+    public function mGck012()
+    {
+        return $this->belongsTo('App\Models\MNecessity4', 'gck_012', 'id');
+    }
+
+    public function mGck013()
+    {
+        return $this->belongsTo('App\Models\MToute', 'gck_013', 'id');
+    }
+
+    public function mGck026()
+    {
+        return $this->belongsTo('App\Models\MService', 'gck_026', 'id');
+    }
+
+    public function mGck028()
+    {
+        return $this->belongsTo('App\Models\MSpl2Housing', 'gck_028', 'id');
+    }
+
+    public function mGck044()
+    {
+        return $this->belongsTo('App\Models\MMerchant', 'gck_044', 'id');
+    }
+
+    public function mGck059()
+    {
+        return $this->belongsTo('App\Models\MLineEquipment', 'gck_059', 'id');
+    }
+
+    public function mGck064()
+    {
+        return $this->belongsTo('App\Models\MSettingSuppression', 'gck_064', 'id');
+    }
 }

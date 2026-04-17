@@ -292,9 +292,39 @@ class TRke extends Model
         return $this->belongsTo('App\Models\MSurveyProcessCode', 'rke_131', 'id');
     }
 
+    public function mRke134()
+    {
+        return $this->belongsTo('App\Models\MPropriety1', 'rke_134', 'id');
+    }
+
+    public function mRke135()
+    {
+        return $this->belongsTo('App\Models\MReuseImpossible', 'rke_135', 'id');
+    }
+
     public function mRke136()
     {
         return $this->belongsTo('App\Models\MIncompatibilityCode', 'rke_136', 'id');
+    }
+
+    public function mRke140()
+    {
+        return $this->belongsTo('App\Models\MExclusiveUse', 'rke_140', 'id');
+    }
+
+    public function mRke145()
+    {
+        return $this->belongsTo('App\Models\MWorkaround', 'rke_145', 'id');
+    }
+
+    public function mRke146()
+    {
+        return $this->belongsTo('App\Models\MPropriety1', 'rke_146', 'id');
+    }
+
+    public function mRke147()
+    {
+        return $this->belongsTo('App\Models\MAreaSearch', 'rke_147', 'id');
     }
 
     public function mRke148()
