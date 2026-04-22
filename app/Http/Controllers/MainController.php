@@ -4,9 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Models\MExclusionNumber;
 use App\Models\TGck;
+use App\Models\TGkj;
 use App\Models\TKhj;
 use App\Models\TKik;
 use App\Models\TKsk;
+use App\Models\TTck;
 use App\Models\TRke;
 use App\Models\TRkk;
 use App\Models\TRko;
@@ -33,6 +35,7 @@ class MainController extends Controller
         $isReadOnly = true;
         $requestNumber = null;
         $tRke = null;
+        $showHouseSurvey = false;
 
         if ($kNo || $mNo) {
             $requestNumber = $kNo;
@@ -56,6 +59,11 @@ class MainController extends Controller
             $mExclusionNumber = $this->setExclusion($requestNumber);
 
             $isReadOnly = ($mExclusionNumber->user_id != $user->id);
+
+            $hasHouseSurveyRko = collect($tRke?->tRko ?? [])->contains(function ($rko) {
+                return in_array($rko?->rko_041, ['ドロップ引込', '光ID施工'], true) && $rko?->rko_042 === '現地調査';
+            });
+            $showHouseSurvey = (($tRke?->rke_019 ?? '') !== '' && !$hasHouseSurveyRko);
         }
 
         return view('main.index')
@@ -66,6 +74,7 @@ class MainController extends Controller
                 'mExclusionNumber',
                 'isReadOnly',
                 'tRke',
+                'showHouseSurvey',
             ));
     }
 
@@ -227,9 +236,11 @@ class MainController extends Controller
                 'tGck.mGck044',
                 'tGck.mGck059',
                 'tGck.mGck064',
+                'tGkj',
                 'tKhj',
                 'tSkk',
                 'tKsk',
+                'tRko',
                 'mRke024',
                 'mRke025',
                 'mRke043',
@@ -353,9 +364,11 @@ class MainController extends Controller
         $this->updateRke($tRke, $input);
         $this->updateKik($tRke, $input);
         $this->updateGck($tRke, $input);
+        $this->updateGkj($tRke, $input);
         $this->updateKhj($tRke, $input);
         $this->updateSkk($tRke, $input);
         $this->updateKsk($tRke, $input);
+        $this->updateHouseSurvey($tRke, $input);
     }
 
     protected function updateKik(TRke $tRke, array $input): void
@@ -486,6 +499,38 @@ class MainController extends Controller
         }
     }
 
+    protected function updateGkj(TRke $tRke, array $input): void
+    {
+        $attributes = $this->extractScopedInput($input, 'gkj', 'gkj_001');
+
+        if ($attributes === []) {
+            return;
+        }
+
+        $hasNonEmptyValue = collect($attributes)->contains(
+            fn ($value) => !is_null($value) && $value !== ''
+        );
+
+        $tGkj = $tRke->tGkj;
+
+        if (!$tGkj) {
+            if (!$hasNonEmptyValue) {
+                return;
+            }
+
+            $tGkj = new TGkj();
+            $tGkj->gkj_001 = $tRke->rke_019;
+        }
+
+        foreach ($attributes as $key => $value) {
+            $tGkj->{$key} = $value;
+        }
+
+        if ($tGkj->isDirty()) {
+            $tGkj->save();
+        }
+    }
+
     protected function updateKsk(TRke $tRke, array $input): void
     {
         $attributes = $this->extractScopedInput($input, 'ksk', 'ksk_001');
@@ -515,6 +560,92 @@ class MainController extends Controller
 
         if ($tKsk->isDirty()) {
             $tKsk->save();
+        }
+    }
+
+    protected function updateHouseSurvey(TRke $tRke, array $input): void
+    {
+        $houseSurveyRows = $input['house_survey'] ?? null;
+
+        if (!is_array($houseSurveyRows) || $houseSurveyRows === []) {
+            return;
+        }
+
+        $isToho = (bool) (Auth::user()?->is_toho ?? false);
+        $rkoAttributes = $isToho
+            ? ['rko_054', 'rko_075', 'rko_076', 'rko_057', 'rko_058', 'rko_078', 'rko_077', 'rko_067', 'rko_068', 'rko_079', 'rko_080', 'rko_081']
+            : ['rko_054', 'rko_067', 'rko_068'];
+        $tckAttributes = $isToho
+            ? ['tck_003', 'tck_004', 'tck_005', 'tck_012', 'tck_013', 'tck_011', 'tck_010', 'tck_008', 'tck_009']
+            : ['tck_005', 'tck_012', 'tck_013', 'tck_011', 'tck_010', 'tck_008', 'tck_009'];
+
+        foreach ($houseSurveyRows as $row) {
+            if (!is_array($row)) {
+                continue;
+            }
+
+            $constCode = $row['rko_001'] ?? null;
+            if (!is_string($constCode) || $constCode === '') {
+                continue;
+            }
+
+            $tRko = TRko::query()
+            ->where('rko_039', $tRke->rke_019)
+                ->where('rko_001', $constCode)
+                ->first();
+
+            if (!$tRko) {
+                continue;
+            }
+
+            foreach ($rkoAttributes as $attribute) {
+                if (!array_key_exists($attribute, $row)) {
+                    continue;
+                }
+
+                $value = $row[$attribute];
+                if (is_array($value) || is_object($value)) {
+                    continue;
+                }
+
+                $tRko->{$attribute} = $value;
+            }
+
+            if ($tRko->isDirty()) {
+                $tRko->save();
+            }
+
+            $tTck = $tRko->tTck;
+            if (!$tTck) {
+                $hasNonEmptyTckValue = collect($tckAttributes)->contains(
+                    fn ($attribute) => array_key_exists($attribute, $row) && !is_null($row[$attribute]) && $row[$attribute] !== ''
+                );
+
+                if (!$hasNonEmptyTckValue) {
+                    continue;
+                }
+
+                $tTck = new TTck();
+                $tTck->tck_001 = $tRko->rko_039;
+                $tTck->tck_002 = $tRko->rko_001;
+            }
+
+            foreach ($tckAttributes as $attribute) {
+                if (!array_key_exists($attribute, $row)) {
+                    continue;
+                }
+
+                $value = $row[$attribute];
+                if (is_array($value) || is_object($value)) {
+                    continue;
+                }
+
+                $tTck->{$attribute} = $value;
+            }
+
+            if ($tTck->isDirty()) {
+                $tTck->save();
+            }
         }
     }
 

@@ -97,6 +97,11 @@ class TRke extends Model
         return $this->hasOne('App\Models\TGck', 'gck_001', 'rke_019');
     }
 
+    public function tGkj()
+    {
+        return $this->hasOne('App\Models\TGkj', 'gkj_001', 'rke_019');
+    }
+
     public function tKhj()
     {
         return $this->hasOne('App\Models\TKhj', 'khj_001', 'rke_019');
@@ -111,6 +116,13 @@ class TRke extends Model
     {
         return $this->hasOne('App\Models\TKsk', 'ksk_001', 'rke_019');
     }
+
+    public function tRko()
+    {
+        return $this->hasMany('App\Models\TRko', 'rko_039', 'rke_019')
+            ->orderBy('rko_001', 'asc');
+    }
+
 
     public function mRke024()
     {

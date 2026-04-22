@@ -3,11 +3,12 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class TRko extends Model
 {
     protected $table = 't_rko';
-    protected $primaryKey = 'rko_001';
+    protected $primaryKey = ['rko_001', 'rko_039'];
     protected $keyType = 'string';
     public $incrementing = false;
 
@@ -38,4 +39,32 @@ class TRko extends Model
             'rko_115' => 'integer',
             'rko_121' => 'datetime:Y/m/d H:i:s',
     ];
+
+    protected function setKeysForSaveQuery($query)
+    {
+        foreach ($this->getKeyName() as $keyName) {
+            $query->where($keyName, '=', $this->getKeyForSaveQuery($keyName));
+        }
+
+        return $query;
+    }
+
+    protected function getKeyForSaveQuery($keyName = null)
+    {
+        if ($keyName === null) {
+            $keyName = $this->getKeyName();
+        }
+
+        if (isset($this->original[$keyName])) {
+            return $this->original[$keyName];
+        }
+
+        return $this->getAttribute($keyName);
+    }
+
+    public function tTck(): HasOne
+    {
+        return $this->hasOne(TTck::class, 'tck_001', 'rko_039')
+            ->where('tck_002', $this->rko_001);
+    }
 }

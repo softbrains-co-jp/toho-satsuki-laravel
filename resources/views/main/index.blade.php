@@ -126,9 +126,27 @@
                     </div>
                     <div x-show="isSectionVisible('constProjectInfo')" x-cloak>
                         <x-section-title>外線工事</x-section-title>
-                        <div class="tw:pt-[25px]">
-                            <livewire:main.const-project-info :kNo="$kNo" :tRke="$tRke" />
-                        </div>
+                        @if (($tRke?->rke_019 ?? '') !== '' && ($tRke?->tGkj?->gkj_001 ?? null) === $tRke?->rke_019)
+                            <div class="tw:pt-[25px]">
+                                <livewire:main.const-line :kNo="$kNo" :tRke="$tRke" />
+                            </div>
+                        @endif
+                    </div>
+                    <div x-show="isSectionVisible('constProjectInfo')" x-cloak>
+                        @if ($showHouseSurvey ?? false)
+                            <x-section-title>宅内調査</x-section-title>
+                            <div class="tw:pt-[25px]">
+                                <livewire:main.house-survery :kNo="$kNo" :tRke="$tRke" />
+                            </div>
+                        @endif
+                    </div>
+                    <div x-show="isSectionVisible('constProjectInfo')" x-cloak>
+                        <x-section-title>宅内工事</x-section-title>
+                        @if (($tRke?->rke_019 ?? '') !== '')
+                            <div class="tw:pt-[25px]">
+                                <livewire:main.house-survery :kNo="$kNo" :tRke="$tRke" />
+                            </div>
+                        @endif
                     </div>
                 </div>
             </div>
