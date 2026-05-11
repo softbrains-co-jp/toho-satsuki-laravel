@@ -9,6 +9,7 @@ use App\Models\TKhj;
 use App\Models\TKik;
 use App\Models\TKsk;
 use App\Models\TTck;
+use App\Models\TOkk;
 use App\Models\TRke;
 use App\Models\TRkk;
 use App\Models\TRko;
@@ -37,6 +38,7 @@ class MainController extends Controller
         $tRke = null;
         $showHouseSurvey = false;
         $showHouseConst = false;
+        $showConstOption = false;
 
         if ($kNo || $mNo) {
             $requestNumber = $kNo;
@@ -68,6 +70,10 @@ class MainController extends Controller
             $showHouseConst = collect($tRke?->tRko ?? [])->contains(function ($rko) {
                 return in_array($rko?->rko_041, ['ドロップ引込', '光ID施工'], true) && $rko?->rko_042 === '新設';
             });
+
+            $showConstOption = collect($tRke?->tRko ?? [])->contains(function ($rko) {
+                return in_array($rko?->rko_041, ['ドロップ引込', '光ID施工'], true) && $rko?->rko_042 === '追加';
+            });
         }
 
         return view('main.index')
@@ -80,6 +86,7 @@ class MainController extends Controller
                 'tRke',
                 'showHouseSurvey',
                 'showHouseConst',
+                'showConstOption',
             ));
     }
 
@@ -375,6 +382,7 @@ class MainController extends Controller
         $this->updateKsk($tRke, $input);
         $this->updateHouseSurvey($tRke, $input);
         $this->updateHouseConst($tRke, $input);
+        $this->updateConstOption($tRke, $input);
     }
 
     protected function updateKik(TRke $tRke, array $input): void
@@ -737,6 +745,92 @@ class MainController extends Controller
 
             if ($tKkk->isDirty()) {
                 $tKkk->save();
+            }
+        }
+    }
+
+    protected function updateConstOption(TRke $tRke, array $input): void
+    {
+        $constOptionRows = $input['const_options'] ?? null;
+
+        if (!is_array($constOptionRows) || $constOptionRows === []) {
+            return;
+        }
+
+        $isToho = (bool) (Auth::user()?->is_toho ?? false);
+        $rkoAttributes = $isToho
+            ? ['rko_054', 'rko_075', 'rko_076', 'rko_057', 'rko_058', 'rko_078', 'rko_077', 'rko_067', 'rko_068', 'rko_079', 'rko_080', 'rko_081']
+            : ['rko_054', 'rko_067', 'rko_068'];
+        $okkAttributes = $isToho
+            ? ['okk_008', 'okk_003', 'okk_004', 'okk_005', 'okk_014', 'okk_015', 'okk_010', 'okk_011', 'okk_012', 'okk_013', 'okk_016', 'okk_017']
+            : ['okk_008', 'okk_005', 'okk_014', 'okk_015', 'okk_010', 'okk_011', 'okk_012', 'okk_013'];
+
+        foreach ($constOptionRows as $row) {
+            if (!is_array($row)) {
+                continue;
+            }
+
+            $constCode = $row['rko_001'] ?? null;
+            if (!is_string($constCode) || $constCode === '') {
+                continue;
+            }
+
+            $tRko = TRko::query()
+                ->where('rko_039', $tRke->rke_019)
+                ->where('rko_001', $constCode)
+                ->first();
+
+            if (!$tRko) {
+                continue;
+            }
+
+            foreach ($rkoAttributes as $attribute) {
+                if (!array_key_exists($attribute, $row)) {
+                    continue;
+                }
+
+                $value = $row[$attribute];
+                if (is_array($value) || is_object($value)) {
+                    continue;
+                }
+
+                $tRko->{$attribute} = $value;
+            }
+
+            if ($tRko->isDirty()) {
+                $tRko->save();
+            }
+
+            $tOkk = $tRko->tOkk;
+            if (!$tOkk) {
+                $hasNonEmptyOkkValue = collect($okkAttributes)->contains(
+                    fn ($attribute) => array_key_exists($attribute, $row) && !is_null($row[$attribute]) && $row[$attribute] !== ''
+                );
+
+                if (!$hasNonEmptyOkkValue) {
+                    continue;
+                }
+
+                $tOkk = new TOkk();
+                $tOkk->okk_001 = $tRko->rko_039;
+                $tOkk->okk_002 = $tRko->rko_001;
+            }
+
+            foreach ($okkAttributes as $attribute) {
+                if (!array_key_exists($attribute, $row)) {
+                    continue;
+                }
+
+                $value = $row[$attribute];
+                if (is_array($value) || is_object($value)) {
+                    continue;
+                }
+
+                $tOkk->{$attribute} = $value;
+            }
+
+            if ($tOkk->isDirty()) {
+                $tOkk->save();
             }
         }
     }

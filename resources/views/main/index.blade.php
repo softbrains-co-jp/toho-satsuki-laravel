@@ -148,6 +148,14 @@
                             </div>
                         @endif
                     </div>
+                    <div x-show="isSectionVisible('constProjectInfo')" x-cloak>
+                        <x-section-title>オプション工事</x-section-title>
+                        @if ($showConstOption ?? false)
+                            <div class="tw:pt-[25px]">
+                                <livewire:main.const-option :kNo="$kNo" :tRke="$tRke" />
+                            </div>
+                        @endif
+                    </div>
                 </div>
             </div>
             <div class="tw:w-full tw:py-0 tw:bg-[#323280]">
