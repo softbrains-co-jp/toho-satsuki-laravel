@@ -67,4 +67,10 @@ class TRko extends Model
         return $this->hasOne(TTck::class, 'tck_001', 'rko_039')
             ->where('tck_002', $this->rko_001);
     }
+
+    public function tKkk(): HasOne
+    {
+        return $this->hasOne(TKkk::class, 'kkk_001', 'rko_039')
+            ->where('kkk_002', $this->rko_001);
+    }
 }

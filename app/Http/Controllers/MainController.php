@@ -36,6 +36,7 @@ class MainController extends Controller
         $requestNumber = null;
         $tRke = null;
         $showHouseSurvey = false;
+        $showHouseConst = false;
 
         if ($kNo || $mNo) {
             $requestNumber = $kNo;
@@ -60,10 +61,13 @@ class MainController extends Controller
 
             $isReadOnly = ($mExclusionNumber->user_id != $user->id);
 
-            $hasHouseSurveyRko = collect($tRke?->tRko ?? [])->contains(function ($rko) {
+            $showHouseSurvey = collect($tRke?->tRko ?? [])->contains(function ($rko) {
                 return in_array($rko?->rko_041, ['ドロップ引込', '光ID施工'], true) && $rko?->rko_042 === '現地調査';
             });
-            $showHouseSurvey = (($tRke?->rke_019 ?? '') !== '' && !$hasHouseSurveyRko);
+
+            $showHouseConst = collect($tRke?->tRko ?? [])->contains(function ($rko) {
+                return in_array($rko?->rko_041, ['ドロップ引込', '光ID施工'], true) && $rko?->rko_042 === '新設';
+            });
         }
 
         return view('main.index')
@@ -75,6 +79,7 @@ class MainController extends Controller
                 'isReadOnly',
                 'tRke',
                 'showHouseSurvey',
+                'showHouseConst',
             ));
     }
 
@@ -369,6 +374,7 @@ class MainController extends Controller
         $this->updateSkk($tRke, $input);
         $this->updateKsk($tRke, $input);
         $this->updateHouseSurvey($tRke, $input);
+        $this->updateHouseConst($tRke, $input);
     }
 
     protected function updateKik(TRke $tRke, array $input): void
@@ -645,6 +651,92 @@ class MainController extends Controller
 
             if ($tTck->isDirty()) {
                 $tTck->save();
+            }
+        }
+    }
+
+    protected function updateHouseConst(TRke $tRke, array $input): void
+    {
+        $houseConstRows = $input['house_const'] ?? null;
+
+        if (!is_array($houseConstRows) || $houseConstRows === []) {
+            return;
+        }
+
+        $isToho = (bool) (Auth::user()?->is_toho ?? false);
+        $rkoAttributes = $isToho
+            ? ['rko_054', 'rko_072', 'rko_073', 'rko_074', 'rko_075', 'rko_076', 'rko_057', 'rko_058', 'rko_078', 'rko_077', 'rko_067', 'rko_068', 'rko_079', 'rko_060', 'rko_064', 'rko_065', 'rko_061', 'rko_063', 'rko_059', 'rko_066', 'rko_080', 'rko_081']
+            : ['rko_054', 'rko_072', 'rko_073', 'rko_074', 'rko_075', 'rko_076', 'rko_067', 'rko_068'];
+        $kkkAttributes = $isToho
+            ? ['kkk_003', 'kkk_005', 'kkk_006', 'kkk_019', 'kkk_020', 'kkk_011', 'kkk_010', 'kkk_009', 'kkk_014', 'kkk_012', 'kkk_015', 'kkk_017', 'kkk_018']
+            : ['kkk_006', 'kkk_019', 'kkk_020', 'kkk_010', 'kkk_009', 'kkk_014', 'kkk_015', 'kkk_017', 'kkk_018'];
+
+        foreach ($houseConstRows as $row) {
+            if (!is_array($row)) {
+                continue;
+            }
+
+            $constCode = $row['rko_001'] ?? null;
+            if (!is_string($constCode) || $constCode === '') {
+                continue;
+            }
+
+            $tRko = TRko::query()
+                ->where('rko_039', $tRke->rke_019)
+                ->where('rko_001', $constCode)
+                ->first();
+
+            if (!$tRko) {
+                continue;
+            }
+
+            foreach ($rkoAttributes as $attribute) {
+                if (!array_key_exists($attribute, $row)) {
+                    continue;
+                }
+
+                $value = $row[$attribute];
+                if (is_array($value) || is_object($value)) {
+                    continue;
+                }
+
+                $tRko->{$attribute} = $value;
+            }
+
+            if ($tRko->isDirty()) {
+                $tRko->save();
+            }
+
+            $tKkk = $tRko->tKkk;
+            if (!$tKkk) {
+                $hasNonEmptyKkkValue = collect($kkkAttributes)->contains(
+                    fn ($attribute) => array_key_exists($attribute, $row) && !is_null($row[$attribute]) && $row[$attribute] !== ''
+                );
+
+                if (!$hasNonEmptyKkkValue) {
+                    continue;
+                }
+
+                $tKkk = new TKkk();
+                $tKkk->kkk_001 = $tRko->rko_039;
+                $tKkk->kkk_002 = $tRko->rko_001;
+            }
+
+            foreach ($kkkAttributes as $attribute) {
+                if (!array_key_exists($attribute, $row)) {
+                    continue;
+                }
+
+                $value = $row[$attribute];
+                if (is_array($value) || is_object($value)) {
+                    continue;
+                }
+
+                $tKkk->{$attribute} = $value;
+            }
+
+            if ($tKkk->isDirty()) {
+                $tKkk->save();
             }
         }
     }

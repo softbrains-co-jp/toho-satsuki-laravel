@@ -133,8 +133,8 @@
                         @endif
                     </div>
                     <div x-show="isSectionVisible('constProjectInfo')" x-cloak>
+                        <x-section-title>宅内調査</x-section-title>
                         @if ($showHouseSurvey ?? false)
-                            <x-section-title>宅内調査</x-section-title>
                             <div class="tw:pt-[25px]">
                                 <livewire:main.house-survery :kNo="$kNo" :tRke="$tRke" />
                             </div>
@@ -142,9 +142,9 @@
                     </div>
                     <div x-show="isSectionVisible('constProjectInfo')" x-cloak>
                         <x-section-title>宅内工事</x-section-title>
-                        @if (($tRke?->rke_019 ?? '') !== '')
+                        @if ($showHouseConst ?? false)
                             <div class="tw:pt-[25px]">
-                                <livewire:main.house-survery :kNo="$kNo" :tRke="$tRke" />
+                                <livewire:main.house-const :kNo="$kNo" :tRke="$tRke" />
                             </div>
                         @endif
                     </div>
