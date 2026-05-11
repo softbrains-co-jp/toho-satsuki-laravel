@@ -156,6 +156,14 @@
                             </div>
                         @endif
                     </div>
+                    <div x-show="isSectionVisible('constProjectInfo')" x-cloak>
+                        <x-section-title>かけつけ設定</x-section-title>
+                        @if ($showSetupRush ?? false)
+                            <div class="tw:pt-[25px]">
+                                <livewire:main.setup-rush :kNo="$kNo" :tRke="$tRke" />
+                            </div>
+                        @endif
+                    </div>
                 </div>
             </div>
             <div class="tw:w-full tw:py-0 tw:bg-[#323280]">

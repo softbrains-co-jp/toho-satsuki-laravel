@@ -14,7 +14,7 @@
 
             <table class="satsuki-table tw:w-full">
                 <tr>
-                    <th>回線依頼番号</th>
+                    <th class="tw:w-[160px]">回線依頼番号</th>
                     <td>{{ $rko?->rko_039 }}</td>
                     <th>工事手配コード</th>
                     <td>{{ $rko?->rko_001 }}</td>
@@ -27,7 +27,7 @@
                     </td>
                 </tr>
                 <tr>
-                    <th>オプション工事工事付託日</th>
+                    <th class="tw:w-[160px]">オプション工事工事付託日</th>
                     <td>{{ $okk?->okk_003?->format('Y/m/d') }}</td>
                     <th>確定工事日</th>
                     <td>{{ $rko?->rko_049?->format('Y/m/d') }}</td>

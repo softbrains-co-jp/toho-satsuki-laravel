@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class TRkk extends Model
 {
@@ -67,4 +68,9 @@ class TRkk extends Model
             'rkk_229' => 'date:Y/m/d',
     ];
 
+    public function tKtk(): HasOne
+    {
+        return $this->hasOne(TKtk::class, 'ktk_001', 'rkk_039')
+            ->where('ktk_002', $this->rkk_001);
+    }
 }

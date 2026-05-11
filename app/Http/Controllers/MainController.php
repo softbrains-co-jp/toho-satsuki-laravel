@@ -9,6 +9,7 @@ use App\Models\TKhj;
 use App\Models\TKik;
 use App\Models\TKsk;
 use App\Models\TTck;
+use App\Models\TKtk;
 use App\Models\TOkk;
 use App\Models\TRke;
 use App\Models\TRkk;
@@ -39,6 +40,7 @@ class MainController extends Controller
         $showHouseSurvey = false;
         $showHouseConst = false;
         $showConstOption = false;
+        $showSetupRush = false;
 
         if ($kNo || $mNo) {
             $requestNumber = $kNo;
@@ -74,6 +76,11 @@ class MainController extends Controller
             $showConstOption = collect($tRke?->tRko ?? [])->contains(function ($rko) {
                 return in_array($rko?->rko_041, ['ドロップ引込', '光ID施工'], true) && $rko?->rko_042 === '追加';
             });
+
+            $showSetupRush = TRkk::query()
+                ->where('rkk_039', $tRke->rke_019)
+                ->where('rkk_041', 'かけつけ')
+                ->exists();
         }
 
         return view('main.index')
@@ -87,6 +94,7 @@ class MainController extends Controller
                 'showHouseSurvey',
                 'showHouseConst',
                 'showConstOption',
+                'showSetupRush',
             ));
     }
 
@@ -383,6 +391,7 @@ class MainController extends Controller
         $this->updateHouseSurvey($tRke, $input);
         $this->updateHouseConst($tRke, $input);
         $this->updateConstOption($tRke, $input);
+        $this->updateSetupRush($tRke, $input);
     }
 
     protected function updateKik(TRke $tRke, array $input): void
@@ -831,6 +840,96 @@ class MainController extends Controller
 
             if ($tOkk->isDirty()) {
                 $tOkk->save();
+            }
+        }
+    }
+
+    protected function updateSetupRush(TRke $tRke, array $input): void
+    {
+        $setupRushRows = $input['setup_rush'] ?? null;
+
+        if (!is_array($setupRushRows) || $setupRushRows === []) {
+            return;
+        }
+
+        $isToho = (bool) (Auth::user()?->is_toho ?? false);
+        $rkkAttributes = $isToho
+            ? ['rkk_054', 'rkk_075', 'rkk_076', 'rkk_153', 'rkk_151', 'rkk_156', 'rkk_057', 'rkk_058', 'rkk_078', 'rkk_077', 'rkk_067', 'rkk_134', 'rkk_068', 'rkk_155', 'rkk_079', 'rkk_080', 'rkk_152', 'rkk_158', 'rkk_108', 'rkk_109']
+            : ['rkk_054', 'rkk_153', 'rkk_151', 'rkk_156', 'rkk_067', 'rkk_134', 'rkk_068', 'rkk_155', 'rkk_152', 'rkk_158'];
+        $ktkAttributes = $isToho
+            ? ['ktk_017', 'ktk_020', 'ktk_015', 'ktk_018', 'ktk_003', 'ktk_004', 'ktk_005', 'ktk_013', 'ktk_014', 'ktk_010', 'ktk_009', 'ktk_007', 'ktk_008', 'ktk_012']
+            : [];
+
+        foreach ($setupRushRows as $row) {
+            if (!is_array($row)) {
+                continue;
+            }
+
+            $constCode = $row['rkk_001'] ?? null;
+            if (!is_string($constCode) || $constCode === '') {
+                continue;
+            }
+
+            $tRkk = TRkk::query()
+                ->where('rkk_039', $tRke->rke_019)
+                ->where('rkk_001', $constCode)
+                ->first();
+
+            if (!$tRkk) {
+                continue;
+            }
+
+            foreach ($rkkAttributes as $attribute) {
+                if (!array_key_exists($attribute, $row)) {
+                    continue;
+                }
+
+                $value = $row[$attribute];
+                if (is_array($value) || is_object($value)) {
+                    continue;
+                }
+
+                $tRkk->{$attribute} = $value;
+            }
+
+            if ($tRkk->isDirty()) {
+                $tRkk->save();
+            }
+
+            if ($ktkAttributes === []) {
+                continue;
+            }
+
+            $tKtk = $tRkk->tKtk;
+            if (!$tKtk) {
+                $hasNonEmptyKtkValue = collect($ktkAttributes)->contains(
+                    fn ($attribute) => array_key_exists($attribute, $row) && !is_null($row[$attribute]) && $row[$attribute] !== ''
+                );
+
+                if (!$hasNonEmptyKtkValue) {
+                    continue;
+                }
+
+                $tKtk = new TKtk();
+                $tKtk->ktk_001 = $tRkk->rkk_039;
+                $tKtk->ktk_002 = $tRkk->rkk_001;
+            }
+
+            foreach ($ktkAttributes as $attribute) {
+                if (!array_key_exists($attribute, $row)) {
+                    continue;
+                }
+
+                $value = $row[$attribute];
+                if (is_array($value) || is_object($value)) {
+                    continue;
+                }
+
+                $tKtk->{$attribute} = $value;
+            }
+
+            if ($tKtk->isDirty()) {
+                $tKtk->save();
             }
         }
     }
