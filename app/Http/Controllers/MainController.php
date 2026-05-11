@@ -358,6 +358,13 @@ class MainController extends Controller
         if (!($tRke instanceof TRke) || !is_array($input)) {
             return;
         }
+
+        $dedicatedRkeAttributes = array_unique(array_merge(
+            $this->constProjectRkeAttributes(),
+            $this->deskDesignRkeAttributes(),
+            $this->lineSurveyRkeAttributes(),
+        ));
+
         foreach ($input as $key => $value) {
             if (!is_string($key)) {
                 continue;
@@ -365,6 +372,9 @@ class MainController extends Controller
 
             // rke_XXX のみ更新対象（主キー rke_019 は除外）
             if (!preg_match('/^rke_\d{3}$/', $key) || $key === 'rke_019') {
+                continue;
+            }
+            if (in_array($key, $dedicatedRkeAttributes, true)) {
                 continue;
             }
             if (is_array($value) || is_object($value)) {
@@ -382,8 +392,10 @@ class MainController extends Controller
     protected function updateData(TRke $tRke, array $input): void
     {
         $this->updateRke($tRke, $input);
+        $this->updateConstProjectInfo($tRke, $input);
+        $this->updateDeskDesignInfo($tRke, $input);
         $this->updateKik($tRke, $input);
-        $this->updateGck($tRke, $input);
+        $this->updateLineSurveyInfo($tRke, $input);
         $this->updateGkj($tRke, $input);
         $this->updateKhj($tRke, $input);
         $this->updateSkk($tRke, $input);
@@ -397,6 +409,7 @@ class MainController extends Controller
     protected function updateKik(TRke $tRke, array $input): void
     {
         $attributes = $this->extractScopedInput($input, 'kik', 'kik_001');
+        $attributes = array_diff_key($attributes, array_flip($this->deskDesignKikAttributes()));
 
         if ($attributes === []) {
             return;
@@ -429,6 +442,11 @@ class MainController extends Controller
     protected function updateKhj(TRke $tRke, array $input): void
     {
         $attributes = $this->extractScopedInput($input, 'khj', 'khj_001');
+        $attributes = array_diff_key($attributes, array_flip(array_merge(
+            $this->constProjectKhjAttributes(),
+            $this->deskDesignKhjAttributes(),
+            $this->lineSurveyKhjAttributes(),
+        )));
 
         if ($attributes === []) {
             return;
@@ -490,9 +508,493 @@ class MainController extends Controller
         }
     }
 
+    protected function updateConstProjectInfo(TRke $tRke, array $input): void
+    {
+        $this->updateConstProjectRke($tRke, $input);
+        $this->updateConstProjectKhj($tRke, $input);
+    }
+
+    protected function updateConstProjectRke(TRke $tRke, array $input): void
+    {
+        foreach ($this->constProjectRkeAttributes() as $attribute) {
+            if (!array_key_exists($attribute, $input)) {
+                continue;
+            }
+
+            $value = $input[$attribute];
+            if (is_array($value) || is_object($value)) {
+                continue;
+            }
+
+            $tRke->{$attribute} = $value;
+        }
+
+        if ($tRke->isDirty()) {
+            $tRke->save();
+        }
+    }
+
+    protected function updateConstProjectKhj(TRke $tRke, array $input): void
+    {
+        $attributes = $this->onlyScalarAttributes($input, $this->constProjectKhjAttributes());
+
+        if ($attributes === []) {
+            return;
+        }
+
+        $hasNonEmptyValue = collect($attributes)->contains(
+            fn ($value) => !is_null($value) && $value !== ''
+        );
+
+        $tKhj = $tRke->tKhj;
+
+        if (!$tKhj) {
+            if (!$hasNonEmptyValue) {
+                return;
+            }
+
+            $tKhj = new TKhj();
+            $tKhj->khj_001 = $tRke->rke_019;
+        }
+
+        foreach ($attributes as $key => $value) {
+            $tKhj->{$key} = $value;
+        }
+
+        if ($tKhj->isDirty()) {
+            $tKhj->save();
+        }
+    }
+
+    protected function constProjectRkeAttributes(): array
+    {
+        return [
+            'rke_155',
+            'rke_213',
+            'rke_216',
+            'rke_217',
+            'rke_218',
+            'rke_221',
+            'rke_222',
+        ];
+    }
+
+    protected function constProjectKhjAttributes(): array
+    {
+        return [
+            'khj_010',
+            'khj_012',
+            'khj_013',
+            'khj_014',
+            'khj_015',
+            'khj_016',
+            'khj_017',
+            'khj_018',
+            'khj_019',
+            'khj_020',
+            'khj_021',
+            'khj_022',
+            'khj_023',
+            'khj_024',
+            'khj_025',
+            'khj_026',
+            'khj_027',
+        ];
+    }
+
+    protected function updateDeskDesignInfo(TRke $tRke, array $input): void
+    {
+        $this->updateDeskDesignRke($tRke, $input);
+        $this->updateDeskDesignScopedModel($tRke, $input, 'tKik', TKik::class, 'kik_001', $this->deskDesignKikAttributes());
+        $this->updateDeskDesignScopedModel($tRke, $input, 'tKhj', TKhj::class, 'khj_001', $this->deskDesignKhjAttributes());
+        $this->updateDeskDesignScopedModel($tRke, $input, 'tSkk', TSkk::class, 'skk_001', $this->deskDesignSkkAttributes());
+        $this->updateDeskDesignScopedModel($tRke, $input, 'tKsk', TKsk::class, 'ksk_001', $this->deskDesignKskAttributes());
+    }
+
+    protected function updateDeskDesignRke(TRke $tRke, array $input): void
+    {
+        foreach ($this->deskDesignRkeAttributes() as $attribute) {
+            if (!array_key_exists($attribute, $input)) {
+                continue;
+            }
+
+            $value = $input[$attribute];
+            if (is_array($value) || is_object($value)) {
+                continue;
+            }
+
+            $tRke->{$attribute} = $value;
+        }
+
+        if ($tRke->isDirty()) {
+            $tRke->save();
+        }
+    }
+
+    protected function updateDeskDesignScopedModel(TRke $tRke, array $input, string $relation, string $model, string $primaryKey, array $allowedAttributes): void
+    {
+        $attributes = $this->onlyScalarAttributes($input, $allowedAttributes);
+
+        if ($attributes === []) {
+            return;
+        }
+
+        $hasNonEmptyValue = collect($attributes)->contains(
+            fn ($value) => !is_null($value) && $value !== ''
+        );
+
+        $record = $tRke->{$relation};
+
+        if (!$record) {
+            if (!$hasNonEmptyValue) {
+                return;
+            }
+
+            $record = new $model();
+            $record->{$primaryKey} = $tRke->rke_019;
+        }
+
+        foreach ($attributes as $key => $value) {
+            $record->{$key} = $value;
+        }
+
+        if ($record->isDirty()) {
+            $record->save();
+        }
+    }
+
+    protected function deskDesignRkeAttributes(): array
+    {
+        return [
+            'rke_072',
+            'rke_074',
+            'rke_076',
+            'rke_079',
+            'rke_080',
+            'rke_081',
+            'rke_082',
+            'rke_083',
+            'rke_088',
+            'rke_121',
+            'rke_123',
+            'rke_124',
+            'rke_125',
+            'rke_126',
+            'rke_127',
+            'rke_128',
+            'rke_129',
+            'rke_130',
+            'rke_131',
+            'rke_132',
+            'rke_133',
+            'rke_136',
+            'rke_137',
+            'rke_138',
+            'rke_170',
+            'rke_171',
+            'rke_172',
+            'rke_173',
+            'rke_226',
+            'rke_227',
+        ];
+    }
+
+    protected function deskDesignKikAttributes(): array
+    {
+        return [
+            'kik_002',
+            'kik_003',
+            'kik_004',
+            'kik_006',
+            'kik_007',
+            'kik_008',
+        ];
+    }
+
+    protected function deskDesignKhjAttributes(): array
+    {
+        return [
+            'khj_026',
+            'khj_027',
+        ];
+    }
+
+    protected function deskDesignSkkAttributes(): array
+    {
+        return [
+            'skk_002',
+            'skk_016',
+        ];
+    }
+
+    protected function deskDesignKskAttributes(): array
+    {
+        return [
+            'ksk_003',
+            'ksk_016',
+        ];
+    }
+
+    protected function updateLineSurveyInfo(TRke $tRke, array $input): void
+    {
+        $this->updateLineSurveyRke($tRke, $input);
+        $this->updateLineSurveyGck($tRke, $input);
+        $this->updateLineSurveyKhj($tRke, $input);
+    }
+
+    protected function updateLineSurveyRke(TRke $tRke, array $input): void
+    {
+        foreach ($this->lineSurveyRkeAttributes() as $attribute) {
+            if (!array_key_exists($attribute, $input)) {
+                continue;
+            }
+
+            $value = $input[$attribute];
+            if (is_array($value) || is_object($value)) {
+                continue;
+            }
+
+            $tRke->{$attribute} = $value;
+        }
+
+        if ($tRke->isDirty()) {
+            $tRke->save();
+        }
+    }
+
+    protected function updateLineSurveyGck(TRke $tRke, array $input): void
+    {
+        $attributes = $this->onlyScalarAttributes($input, $this->lineSurveyGckAttributes());
+
+        if ($attributes === []) {
+            return;
+        }
+
+        $hasNonEmptyValue = collect($attributes)->contains(
+            fn ($value) => !is_null($value) && $value !== ''
+        );
+
+        $tGck = $tRke->tGck;
+
+        if (!$tGck) {
+            if (!$hasNonEmptyValue) {
+                return;
+            }
+
+            $tGck = new TGck();
+            $tGck->gck_001 = $tRke->rke_019;
+        }
+
+        foreach ($attributes as $key => $value) {
+            $tGck->{$key} = $value;
+        }
+
+        if ($tGck->isDirty()) {
+            $tGck->save();
+        }
+    }
+
+    protected function updateLineSurveyKhj(TRke $tRke, array $input): void
+    {
+        $attributes = $this->onlyScalarAttributes($input, $this->lineSurveyKhjAttributes());
+
+        if ($attributes === []) {
+            return;
+        }
+
+        $hasNonEmptyValue = collect($attributes)->contains(
+            fn ($value) => !is_null($value) && $value !== ''
+        );
+
+        $tKhj = $tRke->tKhj;
+
+        if (!$tKhj) {
+            if (!$hasNonEmptyValue) {
+                return;
+            }
+
+            $tKhj = new TKhj();
+            $tKhj->khj_001 = $tRke->rke_019;
+        }
+
+        foreach ($attributes as $key => $value) {
+            $tKhj->{$key} = $value;
+        }
+
+        if ($tKhj->isDirty()) {
+            $tKhj->save();
+        }
+    }
+
+    protected function onlyScalarAttributes(array $input, array $allowedAttributes): array
+    {
+        $attributes = [];
+
+        foreach ($allowedAttributes as $attribute) {
+            if (!array_key_exists($attribute, $input)) {
+                continue;
+            }
+
+            $value = $input[$attribute];
+            if (is_array($value) || is_object($value)) {
+                continue;
+            }
+
+            $attributes[$attribute] = $value;
+        }
+
+        return $attributes;
+    }
+
+    protected function lineSurveyRkeAttributes(): array
+    {
+        return [
+            'rke_074',
+            'rke_077',
+            'rke_078',
+            'rke_079',
+            'rke_080',
+            'rke_083',
+            'rke_088',
+            'rke_100',
+            'rke_101',
+            'rke_102',
+            'rke_104',
+            'rke_105',
+            'rke_106',
+            'rke_108',
+            'rke_109',
+            'rke_110',
+            'rke_111',
+            'rke_112',
+            'rke_113',
+            'rke_114',
+            'rke_115',
+            'rke_116',
+            'rke_117',
+            'rke_118',
+            'rke_119',
+            'rke_120',
+            'rke_123',
+            'rke_124',
+            'rke_125',
+            'rke_126',
+            'rke_127',
+            'rke_128',
+            'rke_129',
+            'rke_130',
+            'rke_131',
+            'rke_132',
+            'rke_133',
+            'rke_134',
+            'rke_135',
+            'rke_136',
+            'rke_137',
+            'rke_138',
+            'rke_139',
+            'rke_140',
+            'rke_141',
+            'rke_142',
+            'rke_143',
+            'rke_144',
+            'rke_145',
+            'rke_146',
+            'rke_147',
+            'rke_149',
+            'rke_150',
+            'rke_151',
+            'rke_153',
+            'rke_154',
+            'rke_157',
+            'rke_170',
+            'rke_171',
+            'rke_172',
+            'rke_173',
+            'rke_226',
+            'rke_227',
+            'rke_246',
+            'rke_268',
+            'rke_269',
+            'rke_270',
+            'rke_271',
+            'rke_272',
+            'rke_273',
+            'rke_274',
+        ];
+    }
+
+    protected function lineSurveyGckAttributes(): array
+    {
+        return [
+            'gck_002',
+            'gck_003',
+            'gck_004',
+            'gck_005',
+            'gck_006',
+            'gck_007',
+            'gck_008',
+            'gck_009',
+            'gck_010',
+            'gck_011',
+            'gck_012',
+            'gck_013',
+            'gck_014',
+            'gck_015',
+            'gck_016',
+            'gck_017',
+            'gck_019',
+            'gck_020',
+            'gck_022',
+            'gck_023',
+            'gck_025',
+            'gck_026',
+            'gck_027',
+            'gck_028',
+            'gck_029',
+            'gck_030',
+            'gck_031',
+            'gck_039',
+            'gck_042',
+            'gck_043',
+            'gck_044',
+            'gck_045',
+            'gck_046',
+            'gck_047',
+            'gck_049',
+            'gck_050',
+            'gck_051',
+            'gck_052',
+            'gck_053',
+            'gck_054',
+            'gck_056',
+            'gck_057',
+            'gck_058',
+            'gck_059',
+            'gck_060',
+            'gck_061',
+            'gck_062',
+            'gck_063',
+            'gck_064',
+        ];
+    }
+
+    protected function lineSurveyKhjAttributes(): array
+    {
+        return [
+            'khj_004',
+            'khj_005',
+            'khj_006',
+            'khj_007',
+            'khj_008',
+            'khj_009',
+            'khj_024',
+        ];
+    }
+
     protected function updateSkk(TRke $tRke, array $input): void
     {
         $attributes = $this->extractScopedInput($input, 'skk', 'skk_001');
+        $attributes = array_diff_key($attributes, array_flip($this->deskDesignSkkAttributes()));
 
         if ($attributes === []) {
             return;
@@ -557,6 +1059,7 @@ class MainController extends Controller
     protected function updateKsk(TRke $tRke, array $input): void
     {
         $attributes = $this->extractScopedInput($input, 'ksk', 'ksk_001');
+        $attributes = array_diff_key($attributes, array_flip($this->deskDesignKskAttributes()));
 
         if ($attributes === []) {
             return;
