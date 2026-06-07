@@ -14,82 +14,82 @@ class VServiceInfo extends Model
     // タイムスタンプ無効化
     public $timestamps = false;
 
-    public function mExistence1_052()
+    public function mRke052()
     {
         return $this->belongsTo('App\Models\MExistence1', 'rke_052', 'id');
     }
 
-    public function mExistence1_053()
+    public function mRke053()
     {
         return $this->belongsTo('App\Models\MExistence1', 'rke_053', 'id');
     }
 
-    public function mExistence1_054()
+    public function mRke054()
     {
         return $this->belongsTo('App\Models\MExistence1', 'rke_054', 'id');
     }
 
-    public function mExistence1_055()
+    public function mRke055()
     {
         return $this->belongsTo('App\Models\MExistence1', 'rke_055', 'id');
     }
 
-    public function mExistence1_056()
+    public function mRke056()
     {
         return $this->belongsTo('App\Models\MExistence1', 'rke_056', 'id');
     }
 
-    public function mNumberReturn()
+    public function mRke057()
     {
         return $this->belongsTo('App\Models\MNumberReturn', 'rke_057', 'id');
     }
 
-    public function mOwnerAgree()
+    public function mRke058()
     {
         return $this->belongsTo('App\Models\MOwnerAgree', 'rke_058', 'id');
     }
 
-    public function mExistence1_059()
+    public function mRke059()
     {
         return $this->belongsTo('App\Models\MExistence1', 'rke_059', 'id');
     }
 
-    public function mExistence1_060()
+    public function mRke060()
     {
         return $this->belongsTo('App\Models\MExistence1', 'rke_060', 'id');
     }
 
-    public function mRadioDisturbanceArea()
-    {
-        return $this->belongsTo('App\Models\MRadioDisturbanceArea', 'rke_228', 'id');
-    }
-
-    public function mDevicePosition()
-    {
-        return $this->belongsTo('App\Models\MDevicePosition', 'rke_230', 'id');
-    }
-
-    public function mExistence1_231()
-    {
-        return $this->belongsTo('App\Models\MExistence1', 'rke_231', 'id');
-    }
-
-    public function mExistence1_232()
-    {
-        return $this->belongsTo('App\Models\MExistence1', 'rke_232', 'id');
-    }
-
-    public function mExistence1_240()
+    public function mRke240()
     {
         return $this->belongsTo('App\Models\MExistence1', 'rke_240', 'id');
     }
 
-    public function mExistence1_243()
+    public function mRke228()
+    {
+        return $this->belongsTo('App\Models\MRadioDisturbanceArea', 'rke_228', 'id');
+    }
+
+    public function mRke230()
+    {
+        return $this->belongsTo('App\Models\MDevicePosition', 'rke_230', 'id');
+    }
+
+    public function mRke231()
+    {
+        return $this->belongsTo('App\Models\MExistence1', 'rke_231', 'id');
+    }
+
+    public function mRke232()
+    {
+        return $this->belongsTo('App\Models\MExistence1', 'rke_232', 'id');
+    }
+
+    public function mRke243()
     {
         return $this->belongsTo('App\Models\MExistence1', 'rke_243', 'id');
     }
 
-    public function mExistence1_275()
+    public function mRke275()
     {
         return $this->belongsTo('App\Models\MExistence1', 'rke_275', 'id');
     }
