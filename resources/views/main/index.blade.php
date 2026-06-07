@@ -180,6 +180,14 @@
                             </div>
                         @endif
                     </div>
+                    <div x-show="isSectionVisible('constProjectInfo')" x-cloak>
+                        <x-section-title>外線撤去</x-section-title>
+                        @if ($tRke !== null)
+                            <div class="tw:pt-[25px]">
+                                <livewire:main.line-removal :kNo="$kNo" :tRke="$tRke" />
+                            </div>
+                        @endif
+                    </div>
                 </div>
             </div>
             <div class="tw:w-full tw:py-0 tw:bg-[#323280]">

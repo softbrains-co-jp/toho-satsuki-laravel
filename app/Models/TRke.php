@@ -97,6 +97,11 @@ class TRke extends Model
         return $this->hasOne('App\Models\TGck', 'gck_001', 'rke_019');
     }
 
+    public function tGtj()
+    {
+        return $this->hasOne('App\Models\TGtj', 'gtj_001', 'rke_019');
+    }
+
     public function tGkj()
     {
         return $this->hasOne('App\Models\TGkj', 'gkj_001', 'rke_019');

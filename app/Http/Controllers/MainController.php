@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\MExclusionNumber;
 use App\Models\TGck;
 use App\Models\TGkj;
+use App\Models\TGtj;
 use App\Models\TKhj;
 use App\Models\TKik;
 use App\Models\TKsk;
@@ -269,6 +270,7 @@ class MainController extends Controller
                 'tGck.mGck059',
                 'tGck.mGck064',
                 'tGkj',
+                'tGtj',
                 'tKhj',
                 'tSkk',
                 'tKsk',
@@ -416,6 +418,7 @@ class MainController extends Controller
         $this->updateHouseConst($tRke, $input);
         $this->updateConstOption($tRke, $input);
         $this->updateSetupRush($tRke, $input);
+        $this->updateLineRemoval($tRke, $input);
     }
 
     protected function updateKik(TRke $tRke, array $input): void
@@ -1446,6 +1449,75 @@ class MainController extends Controller
             if ($tKtk->isDirty()) {
                 $tKtk->save();
             }
+        }
+    }
+
+    protected function updateLineRemoval(TRke $tRke, array $input): void
+    {
+        $lineRemovalInput = $input['line_removal'] ?? null;
+
+        if (!is_array($lineRemovalInput)) {
+            return;
+        }
+
+        $isToho = (bool) (auth()->user()?->is_toho ?? false);
+
+        $rkeAttributes = ['rke_257', 'rke_258', 'rke_259', 'rke_260', 'rke_256', 'rke_261', 'rke_262', 'rke_263'];
+        foreach ($rkeAttributes as $attribute) {
+            if (!array_key_exists($attribute, $lineRemovalInput)) {
+                continue;
+            }
+            $value = $lineRemovalInput[$attribute];
+            if (is_array($value) || is_object($value)) {
+                continue;
+            }
+            $tRke->{$attribute} = $value;
+        }
+        if ($tRke->isDirty()) {
+            $tRke->save();
+        }
+
+        $gtjAttributes = $isToho
+            ? ['gtj_002', 'gtj_003', 'gtj_004', 'gtj_005', 'gtj_006', 'gtj_007', 'gtj_008', 'gtj_009']
+            : ['gtj_004', 'gtj_005', 'gtj_006', 'gtj_008', 'gtj_009'];
+
+        $filteredGtj = [];
+        foreach ($gtjAttributes as $attribute) {
+            if (!array_key_exists($attribute, $lineRemovalInput)) {
+                continue;
+            }
+            $value = $lineRemovalInput[$attribute];
+            if (is_array($value) || is_object($value)) {
+                continue;
+            }
+            $filteredGtj[$attribute] = $value;
+        }
+
+        if ($filteredGtj === []) {
+            return;
+        }
+
+        $tGtj = $tRke->tGtj;
+
+        if (!$tGtj) {
+            $hasNonEmptyValue = collect($filteredGtj)->contains(
+                fn ($value) => !is_null($value) && $value !== ''
+            );
+
+            if (!$hasNonEmptyValue) {
+                return;
+            }
+
+            $tGtj = new TGtj();
+            $tGtj->gtj_001 = $tRke->rke_019;
+        }
+
+        foreach ($filteredGtj as $key => $value) {
+            $tGtj->{$key} = $value;
+        }
+
+        if ($tGtj->isDirty()) {
+            $tGtj->save();
         }
     }
 
