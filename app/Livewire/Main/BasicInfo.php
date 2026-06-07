@@ -9,20 +9,38 @@ use Livewire\Component;
 
 class BasicInfo extends Component
 {
-    public $kNo = null;
-    public $tRke = null;
-    // public $vBasicInfo = null;
+    public $requestNumber = null;
+    public $vBasicInfo = null;
     public $refreshIntervalSeconds = 180;
+
+    private const RELATIONS = [
+        'mRke024',
+        'mRke025',
+        'mRke044',
+        'mRke174',
+        'mRke043',
+        'mRke239',
+    ];
 
     public function mount(): void
     {
         $refreshIntervalMinutes = max((int) config('lock.refresh_interval_minutes', 3), 1);
         $this->refreshIntervalSeconds = $refreshIntervalMinutes * 60;
+
+        if (!$this->requestNumber) {
+            $this->vBasicInfo = null;
+            return;
+        }
+
+        $this->vBasicInfo = VBasicInfo::query()
+            ->with(self::RELATIONS)
+            ->where('rke_019', $this->requestNumber)
+            ->first();
     }
 
     public function refreshExclusion(): void
     {
-        if (!$this->kNo) {
+        if (!$this->requestNumber) {
             return;
         }
 
@@ -32,7 +50,7 @@ class BasicInfo extends Component
         }
 
         MExclusionNumber::query()
-            ->where('request_number', $this->kNo)
+            ->where('request_number', $this->requestNumber)
             ->where('user_id', $user->id)
             ->update([
                 'date_update' => now(),

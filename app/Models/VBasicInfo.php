@@ -14,32 +14,32 @@ class VBasicInfo extends Model
     // タイムスタンプ無効化
     public $timestamps = false;
 
-    public function mHouseStyle()
+    public function mRke024()
     {
         return $this->belongsTo('App\Models\MHouseStyle', 'rke_024', 'id');
     }
 
-    public function mHouseOwnership()
+    public function mRke025()
     {
         return $this->belongsTo('App\Models\MHouseOwnership', 'rke_025', 'id');
     }
 
-    public function mMoveIn()
+    public function mRke044()
     {
         return $this->belongsTo('App\Models\MMoveIn', 'rke_044', 'id');
     }
 
-    public function mLineSpeed()
+    public function mRke174()
     {
         return $this->belongsTo('App\Models\MLineSpeed', 'rke_174', 'id');
     }
 
-    public function mExistence1_043()
+    public function mRke043()
     {
         return $this->belongsTo('App\Models\MExistence1', 'rke_043', 'id');
     }
 
-    public function mExistence1_239()
+    public function mRke239()
     {
         return $this->belongsTo('App\Models\MExistence1', 'rke_239', 'id');
     }
