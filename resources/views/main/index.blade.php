@@ -79,7 +79,7 @@
                     <div x-show="isSectionVisible('serviceInfo')" x-cloak>
                         <x-section-title>物件情報</x-section-title>
                         <div class="tw:pt-[25px]">
-                            <livewire:main.article-info :kNo="$kNo" :tRke="$tRke" />
+                            <livewire:main.article-info :requestNumber="$requestNumber" />
                         </div>
                     </div>
                     <div x-show="isSectionVisible('facilityInfo')" x-cloak>
