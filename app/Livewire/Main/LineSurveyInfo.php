@@ -29,12 +29,13 @@ use App\Models\MSpl2Housing;
 use App\Models\MSurveyProcessCode;
 use App\Models\MToute;
 use App\Models\MWorkaround;
+use App\Models\VLineSurveyInfo;
 use Livewire\Component;
 
 class LineSurveyInfo extends Component
 {
-    public $kNo = null;
-    public $tRke = null;
+    public $requestNumber = null;
+    public $vLineSurveyInfo = null;
     public $mCostDetailOptions = [];
     public $mClaimAreaOptions = [];
     public $mExistence1Options = [];
@@ -62,6 +63,62 @@ class LineSurveyInfo extends Component
     public $mTouteOptions = [];
     public $mNttOfficeOptions = [];
     public $mOfferProprietyOptions = [];
+
+    private const RELATIONS = [
+        'mGck003',
+        'mRke124',
+        'mKhj006',
+        'mKhj007',
+        'mKhj024',
+        'mRke123',
+        'mKhj009',
+        'mKhj008',
+        'mGck026',
+        'mGck011',
+        'mGck027',
+        'mGck028',
+        'mRke088',
+        'mRke083',
+        'mRke079',
+        'mRke134',
+        'mRke135',
+        'mGck005',
+        'mRke125',
+        'mRke128',
+        'mRke131',
+        'mGck012',
+        'mRke119',
+        'mRke140',
+        'mRke143',
+        'mRke145',
+        'mRke146',
+        'mRke117',
+        'mRke111',
+        'mRke114',
+        'mGck007',
+        'mRke223',
+        'mRke224',
+        'mRke225',
+        'mRke226',
+        'mRke227',
+        'mGck010',
+        'mGck059',
+        'mRke147',
+        'mGck064',
+        'mRke148',
+        'mRke149',
+        'mRke136',
+        'mGck013',
+        'mGck044',
+        'mGck047',
+        'mGck046',
+        'mGck042',
+        'mGck029',
+        'mGck030',
+        'mGck049',
+        'mGck050',
+        'mGck039',
+    ];
 
     public function mount(): void
     {
@@ -199,6 +256,16 @@ class LineSurveyInfo extends Component
             ->orderBy('sort', 'asc')
             ->pluck('val', 'id')
             ->toArray();
+
+        if (!$this->requestNumber) {
+            $this->vLineSurveyInfo = null;
+            return;
+        }
+
+        $this->vLineSurveyInfo = VLineSurveyInfo::query()
+            ->with(self::RELATIONS)
+            ->where('rke_019', $this->requestNumber)
+            ->first();
     }
 
     public function render()

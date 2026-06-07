@@ -2,16 +2,24 @@
 
 namespace App\Livewire\Main;
 
-use App\Models\VServiceInfo;
+use App\Models\VRemarksAggregation;
 use Livewire\Component;
 
 class RemarksAggregation extends Component
 {
-    public $kNo = null;
-    public $tRke = null;
+    public $requestNumber = null;
+    public $vRemarksAggregation = null;
 
     public function mount(): void
     {
+        if (!$this->requestNumber) {
+            $this->vRemarksAggregation = null;
+            return;
+        }
+
+        $this->vRemarksAggregation = VRemarksAggregation::query()
+            ->where('rke_019', $this->requestNumber)
+            ->first();
     }
 
     public function render()

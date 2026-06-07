@@ -103,19 +103,19 @@
                     <div x-show="isSectionVisible('remarksAggregation')" x-cloak>
                         <x-section-title>備考集約</x-section-title>
                         <div class="tw:pt-[25px]">
-                            <livewire:main.remarks-aggregation :kNo="$kNo" :tRke="$tRke" />
+                            <livewire:main.remarks-aggregation :requestNumber="$requestNumber" />
                         </div>
                     </div>
                     <div x-show="isSectionVisible('deskDesignInfo')" x-cloak>
                         <x-section-title>机上設計情報</x-section-title>
                         <div class="tw:pt-[25px]">
-                            <livewire:main.desk-design-info :kNo="$kNo" :tRke="$tRke" />
+                            <livewire:main.desk-design-info :requestNumber="$requestNumber" />
                         </div>
                     </div>
                     <div x-show="isSectionVisible('lineSurveyInfo')" x-cloak>
                         <x-section-title>外線調査情報</x-section-title>
                         <div class="tw:pt-[25px]">
-                            <livewire:main.line-survey-info :kNo="$kNo" :tRke="$tRke" />
+                            <livewire:main.line-survey-info :requestNumber="$requestNumber" />
                         </div>
                     </div>
                     <div x-show="isSectionVisible('constProjectInfo')" x-cloak>
