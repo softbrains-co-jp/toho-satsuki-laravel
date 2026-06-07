@@ -22,15 +22,13 @@ use App\Models\MRemovalCode;
 use App\Models\MRemovalPattern;
 use App\Models\MRemovalReasonCode;
 use App\Models\MUndecidedDelay;
-use App\Models\TRko;
-use App\Models\TTkk;
-use Illuminate\Support\Collection;
+use App\Models\VConstRemove;
 use Livewire\Component;
 
 class ConstRemove extends Component
 {
-    public $kNo = null;
-    public $tRke = null;
+    public $requestNumber = null;
+    public $constRemoveList = [];
 
     public $mConstHopeOptions = [];
     public $mHouseStyleOptions = [];
@@ -53,18 +51,44 @@ class ConstRemove extends Component
     public $mRemovalReasonCodeOptions = [];
     public $mReasonDelayOptions = [];
 
+    private const RELATIONS = [
+        'mTkk025',
+        'mRko070',
+        'mRko104',
+        'mTkk004',
+        'mRko020',
+        'mRko021',
+        'mRko083',
+        'mRko090',
+        'mRko029',
+        'mRko052',
+        'mTkk013',
+        'mRko072',
+        'mRko073',
+        'mRko074',
+        'mRko075',
+        'mRko076',
+        'mTkk005',
+        'mRko051',
+        'mTkk019',
+        'mTkk020',
+        'mRko056',
+        'mRko077',
+        'mRko067',
+        'mRko071',
+        'mTkk029',
+    ];
+
     public function mount(): void
     {
         $isToho = auth()->user()->is_toho;
-        $requestNumber = $this->tRke?->rke_019;
         $selectedMerchantIds = [];
 
-        if ($requestNumber) {
-            $constRemoveList = $this->constRemoveQuery($requestNumber)->get();
-            $this->attachTkkRelations($constRemoveList);
+        if ($this->requestNumber) {
+            $this->constRemoveList = $this->constRemoveQuery($this->requestNumber)->get();
 
-            $selectedMerchantIds = $constRemoveList
-                ->map(fn ($rko) => $rko?->tTkk?->tkk_005)
+            $selectedMerchantIds = $this->constRemoveList
+                ->pluck('tkk_005')
                 ->filter(fn ($value) => $value !== '')
                 ->unique()
                 ->values()
@@ -105,44 +129,19 @@ class ConstRemove extends Component
 
     public function render()
     {
-        $requestNumber = $this->tRke?->rke_019;
-        $constRemoveList = collect();
-
-        if (is_string($requestNumber) && $requestNumber !== '') {
-            $constRemoveList = $this->constRemoveQuery($requestNumber)->get();
-            $this->attachTkkRelations($constRemoveList);
-        }
-
         return view('livewire.main.const-remove', [
-            'constRemoveList' => $constRemoveList,
+            'constRemoveList' => $this->constRemoveList,
         ]);
     }
 
     protected function constRemoveQuery(string $requestNumber)
     {
-        return TRko::query()
+        return VConstRemove::query()
+            ->with(self::RELATIONS)
             ->where('rko_039', $requestNumber)
             ->whereIn('rko_041', ['ドロップ引込', '光ID施工'])
             ->where('rko_042', '撤去')
             ->orderBy('rko_001', 'asc');
-    }
-
-    protected function attachTkkRelations(Collection $constRemoveList): void
-    {
-        if ($constRemoveList->isEmpty()) {
-            return;
-        }
-
-        $tkkMap = TTkk::query()
-            ->whereIn('tkk_001', $constRemoveList->pluck('rko_039')->unique()->all())
-            ->whereIn('tkk_002', $constRemoveList->pluck('rko_001')->unique()->all())
-            ->get()
-            ->keyBy(fn (TTkk $tTkk) => $tTkk->tkk_001 . ':' . $tTkk->tkk_002);
-
-        $constRemoveList->each(function ($rko) use ($tkkMap) {
-            $compositeKey = $rko->rko_039 . ':' . $rko->rko_001;
-            $rko->setRelation('tTkk', $tkkMap->get($compositeKey));
-        });
     }
 
     protected function options(string $model): array

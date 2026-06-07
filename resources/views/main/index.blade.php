@@ -176,7 +176,7 @@
                         <x-section-title>撤去工事</x-section-title>
                         @if ($showConstRemove ?? false)
                             <div class="tw:pt-[25px]">
-                                <livewire:main.const-remove :kNo="$kNo" :tRke="$tRke" />
+                                <livewire:main.const-remove :requestNumber="$requestNumber" />
                             </div>
                         @endif
                     </div>
