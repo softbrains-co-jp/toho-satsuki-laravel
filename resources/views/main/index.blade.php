@@ -164,6 +164,14 @@
                             </div>
                         @endif
                     </div>
+                    <div x-show="isSectionVisible('constProjectInfo')" x-cloak>
+                        <x-section-title>移設工事</x-section-title>
+                        @if ($showConstRelocation ?? false)
+                            <div class="tw:pt-[25px]">
+                                <livewire:main.const-relocation :kNo="$kNo" :tRke="$tRke" />
+                            </div>
+                        @endif
+                    </div>
                 </div>
             </div>
             <div class="tw:w-full tw:py-0 tw:bg-[#323280]">

@@ -41,6 +41,7 @@ class MainController extends Controller
         $showHouseConst = false;
         $showConstOption = false;
         $showSetupRush = false;
+        $showConstRelocation = false;
 
         if ($kNo || $mNo) {
             $requestNumber = $kNo;
@@ -81,6 +82,10 @@ class MainController extends Controller
                 ->where('rkk_039', $tRke->rke_019)
                 ->where('rkk_041', 'かけつけ')
                 ->exists();
+
+            $showConstRelocation = collect($tRke?->tRko ?? [])->contains(function ($rko) {
+                return in_array($rko?->rko_041, ['ドロップ引込', '光ID施工'], true) && $rko?->rko_042 === '宅内移設１';
+            });
         }
 
         return view('main.index')
@@ -95,6 +100,7 @@ class MainController extends Controller
                 'showHouseConst',
                 'showConstOption',
                 'showSetupRush',
+                'showConstRelocation',
             ));
     }
 
