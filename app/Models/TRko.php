@@ -62,6 +62,18 @@ class TRko extends Model
         return $this->getAttribute($keyName);
     }
 
+    public function tTik(): HasOne
+    {
+        return $this->hasOne(TTik::class, 'tik_001', 'rko_039')
+            ->where('tik_002', $this->rko_001);
+    }
+
+    public function tTkk(): HasOne
+    {
+        return $this->hasOne(TTkk::class, 'tkk_001', 'rko_039')
+            ->where('tkk_002', $this->rko_001);
+    }
+
     public function tTck(): HasOne
     {
         return $this->hasOne(TTck::class, 'tck_001', 'rko_039')
