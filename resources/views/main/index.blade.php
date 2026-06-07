@@ -172,6 +172,14 @@
                             </div>
                         @endif
                     </div>
+                    <div x-show="isSectionVisible('constProjectInfo')" x-cloak>
+                        <x-section-title>撤去工事</x-section-title>
+                        @if ($showConstRemove ?? false)
+                            <div class="tw:pt-[25px]">
+                                <livewire:main.const-remove :kNo="$kNo" :tRke="$tRke" />
+                            </div>
+                        @endif
+                    </div>
                 </div>
             </div>
             <div class="tw:w-full tw:py-0 tw:bg-[#323280]">

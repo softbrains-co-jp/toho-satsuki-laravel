@@ -42,6 +42,7 @@ class MainController extends Controller
         $showConstOption = false;
         $showSetupRush = false;
         $showConstRelocation = false;
+        $showConstRemove = false;
 
         if ($kNo || $mNo) {
             $requestNumber = $kNo;
@@ -86,6 +87,10 @@ class MainController extends Controller
             $showConstRelocation = collect($tRke?->tRko ?? [])->contains(function ($rko) {
                 return in_array($rko?->rko_041, ['ドロップ引込', '光ID施工'], true) && $rko?->rko_042 === '宅内移設１';
             });
+
+            $showConstRemove = collect($tRke?->tRko ?? [])->contains(function ($rko) {
+                return in_array($rko?->rko_041, ['ドロップ引込', '光ID施工'], true) && $rko?->rko_042 === '撤去';
+            });
         }
 
         return view('main.index')
@@ -101,6 +106,7 @@ class MainController extends Controller
                 'showConstOption',
                 'showSetupRush',
                 'showConstRelocation',
+                'showConstRemove',
             ));
     }
 
