@@ -136,7 +136,7 @@
                         <x-section-title>宅内調査</x-section-title>
                         @if ($showHouseSurvey ?? false)
                             <div class="tw:pt-[25px]">
-                                <livewire:main.house-survery :kNo="$kNo" :tRke="$tRke" />
+                                <livewire:main.house-survery :requestNumber="$requestNumber" />
                             </div>
                         @endif
                     </div>

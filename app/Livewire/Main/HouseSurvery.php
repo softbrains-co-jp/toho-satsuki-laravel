@@ -15,16 +15,14 @@ use App\Models\MExistence2;
 use App\Models\MHouseOwnership;
 use App\Models\MHouseStyle;
 use App\Models\MMerchant;
-use App\Models\TRko;
-use App\Models\TTck;
 use App\Models\MUndecidedDelay;
-use Illuminate\Support\Collection;
+use App\Models\VHouseSurvey;
 use Livewire\Component;
 
 class HouseSurvery extends Component
 {
-    public $kNo = null;
-    public $tRke = null;
+    public $requestNumber = null;
+    public $houseSurveyList = [];
     public $mConstHopeOptions = [];
     public $mHouseStyleOptions = [];
     public $mHouseOwnershipOptions = [];
@@ -40,18 +38,38 @@ class HouseSurvery extends Component
     public $mConstCompletionOptions = [];
     public $mConstDelayCodeOptions = [];
 
+    private const RELATIONS = [
+        'mRko104',
+        'mRko020',
+        'mRko021',
+        'mRko083',
+        'mRko090',
+        'mRko029',
+        'mRko052',
+        'mRko072',
+        'mRko073',
+        'mRko074',
+        'mRko075',
+        'mRko076',
+        'mTck004',
+        'mRko051',
+        'mTck012',
+        'mTck013',
+        'mRko056',
+        'mRko077',
+        'mRko067',
+    ];
+
     public function mount(): void
     {
         $isToho = auth()->user()->is_toho;
-        $requestNumber = $this->tRke?->rke_019;
         $selectedMerchantIds = [];
 
-        if ($requestNumber) {
-            $houseSurveyList = $this->houseSurveyQuery($requestNumber)->get();
-            $this->attachTckRelations($houseSurveyList);
+        if ($this->requestNumber) {
+            $this->houseSurveyList = $this->houseSurveyQuery($this->requestNumber)->get();
 
-            $selectedMerchantIds = $houseSurveyList
-                ->map(fn ($rko) => $rko?->tTck?->tck_004)
+            $selectedMerchantIds = $this->houseSurveyList
+                ->pluck('tck_004')
                 ->filter(fn ($value) => $value !== '')
                 ->unique()
                 ->values()
@@ -140,43 +158,18 @@ class HouseSurvery extends Component
 
     public function render()
     {
-        $requestNumber = $this->tRke?->rke_019;
-        $houseSurveyList = collect();
-
-        if (is_string($requestNumber) && $requestNumber !== '') {
-            $houseSurveyList = $this->houseSurveyQuery($requestNumber)->get();
-            $this->attachTckRelations($houseSurveyList);
-        }
-
         return view('livewire.main.house-survery', [
-            'houseSurveyList' => $houseSurveyList,
+            'houseSurveyList' => $this->houseSurveyList,
         ]);
     }
 
     protected function houseSurveyQuery(string $requestNumber)
     {
-        return TRko::query()
+        return VHouseSurvey::query()
+            ->with(self::RELATIONS)
             ->where('rko_039', $requestNumber)
             ->whereIn('rko_041', ['ドロップ引込', '光ID施工'])
             ->where('rko_042', '現地調査')
             ->orderBy('rko_001', 'asc');
-    }
-
-    protected function attachTckRelations(Collection $houseSurveyList): void
-    {
-        if ($houseSurveyList->isEmpty()) {
-            return;
-        }
-
-        $tckMap = TTck::query()
-            ->whereIn('tck_001', $houseSurveyList->pluck('rko_039')->unique()->all())
-            ->whereIn('tck_002', $houseSurveyList->pluck('rko_001')->unique()->all())
-            ->get()
-            ->keyBy(fn (TTck $tTck) => $tTck->tck_001 . ':' . $tTck->tck_002);
-
-        $houseSurveyList->each(function ($rko) use ($tckMap) {
-            $compositeKey = $rko->rko_039 . ':' . $rko->rko_001;
-            $rko->setRelation('tTck', $tckMap->get($compositeKey));
-        });
     }
 }
