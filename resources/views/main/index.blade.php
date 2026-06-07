@@ -152,7 +152,7 @@
                         <x-section-title>オプション工事</x-section-title>
                         @if ($showConstOption ?? false)
                             <div class="tw:pt-[25px]">
-                                <livewire:main.const-option :kNo="$kNo" :tRke="$tRke" />
+                                <livewire:main.const-option :requestNumber="$requestNumber" />
                             </div>
                         @endif
                     </div>
