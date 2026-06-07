@@ -5,29 +5,35 @@ namespace App\Livewire\Main;
 use App\Models\MExistence1;
 use App\Models\MMerchant;
 use App\Models\MSpl2Shape;
-use App\Models\TGtj;
+use App\Models\VLineRemoval;
 use Livewire\Component;
 
 class LineRemoval extends Component
 {
-    public $kNo = null;
-    public $tRke = null;
+    public $requestNumber = null;
+    public $vLineRemoval = null;
 
     public $mMerchantOptions = [];
     public $mExistence1Options = [];
     public $mSpl2ShapeOptions = [];
 
+    private const RELATIONS = [
+        'mGtj003',
+        'mGtj007',
+        'mRke261',
+        'mRke091',
+    ];
+
     public function mount(): void
     {
         $isToho = auth()->user()->is_toho;
-        $requestNumber = $this->tRke?->rke_019;
         $selectedMerchantIds = [];
 
-        if ($requestNumber) {
-            $tGtj = $this->queryGtj($requestNumber);
+        if ($this->requestNumber) {
+            $this->vLineRemoval = $this->queryLineRemoval($this->requestNumber);
 
             $selectedMerchantIds = array_values(array_unique(array_filter(
-                [$tGtj?->gtj_003, $tGtj?->gtj_007],
+                [$this->vLineRemoval?->gtj_003, $this->vLineRemoval?->gtj_007],
                 fn ($v) => $v !== '' && $v !== null
             )));
         }
@@ -49,20 +55,16 @@ class LineRemoval extends Component
 
     public function render()
     {
-        $requestNumber = $this->tRke?->rke_019;
-        $tGtj = null;
-
-        if (is_string($requestNumber) && $requestNumber !== '') {
-            $tGtj = $this->queryGtj($requestNumber);
-        }
-
         return view('livewire.main.line-removal', [
-            'tGtj' => $tGtj,
+            'vLineRemoval' => $this->vLineRemoval,
         ]);
     }
 
-    protected function queryGtj(string $requestNumber): ?TGtj
+    protected function queryLineRemoval(string $requestNumber): ?VLineRemoval
     {
-        return TGtj::query()->where('gtj_001', $requestNumber)->first();
+        return VLineRemoval::query()
+            ->with(self::RELATIONS)
+            ->where('rke_019', $requestNumber)
+            ->first();
     }
 }

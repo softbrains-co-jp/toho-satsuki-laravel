@@ -184,7 +184,7 @@
                         <x-section-title>外線撤去</x-section-title>
                         @if ($tRke !== null)
                             <div class="tw:pt-[25px]">
-                                <livewire:main.line-removal :kNo="$kNo" :tRke="$tRke" />
+                                <livewire:main.line-removal :requestNumber="$requestNumber" />
                             </div>
                         @endif
                     </div>
