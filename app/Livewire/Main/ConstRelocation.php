@@ -19,15 +19,13 @@ use App\Models\MNecessity1;
 use App\Models\MReasonDelay;
 use App\Models\MUndecidedDelay;
 use App\Models\MWorkContent;
-use App\Models\TTik;
-use App\Models\TRko;
-use Illuminate\Support\Collection;
+use App\Models\VConstRelocation;
 use Livewire\Component;
 
 class ConstRelocation extends Component
 {
-    public $kNo = null;
-    public $tRke = null;
+    public $requestNumber = null;
+    public $constRelocationList = [];
 
     public $mConstHopeOptions = [];
     public $mHouseStyleOptions = [];
@@ -47,18 +45,42 @@ class ConstRelocation extends Component
     public $mNecessity1Options = [];
     public $mReasonDelayOptions = [];
 
+    private const RELATIONS = [
+        'mRko104',
+        'mTik014',
+        'mTik016',
+        'mRko020',
+        'mRko021',
+        'mRko083',
+        'mRko090',
+        'mRko029',
+        'mRko052',
+        'mRko072',
+        'mRko073',
+        'mRko074',
+        'mRko075',
+        'mRko076',
+        'mTik004',
+        'mRko051',
+        'mTik017',
+        'mTik018',
+        'mRko056',
+        'mRko077',
+        'mTik015',
+        'mRko067',
+        'mTik022',
+    ];
+
     public function mount(): void
     {
         $isToho = auth()->user()->is_toho;
-        $requestNumber = $this->tRke?->rke_019;
         $selectedMerchantIds = [];
 
-        if ($requestNumber) {
-            $constRelocationList = $this->constRelocationQuery($requestNumber)->get();
-            $this->attachTikRelations($constRelocationList);
+        if ($this->requestNumber) {
+            $this->constRelocationList = $this->constRelocationQuery($this->requestNumber)->get();
 
-            $selectedMerchantIds = $constRelocationList
-                ->map(fn ($rko) => $rko?->tTik?->tik_004)
+            $selectedMerchantIds = $this->constRelocationList
+                ->pluck('tik_004')
                 ->filter(fn ($value) => $value !== '')
                 ->unique()
                 ->values()
@@ -96,44 +118,19 @@ class ConstRelocation extends Component
 
     public function render()
     {
-        $requestNumber = $this->tRke?->rke_019;
-        $constRelocationList = collect();
-
-        if (is_string($requestNumber) && $requestNumber !== '') {
-            $constRelocationList = $this->constRelocationQuery($requestNumber)->get();
-            $this->attachTikRelations($constRelocationList);
-        }
-
         return view('livewire.main.const-relocation', [
-            'constRelocationList' => $constRelocationList,
+            'constRelocationList' => $this->constRelocationList,
         ]);
     }
 
     protected function constRelocationQuery(string $requestNumber)
     {
-        return TRko::query()
+        return VConstRelocation::query()
+            ->with(self::RELATIONS)
             ->where('rko_039', $requestNumber)
             ->whereIn('rko_041', ['ドロップ引込', '光ID施工'])
             ->where('rko_042', '宅内移設１')
             ->orderBy('rko_001', 'asc');
-    }
-
-    protected function attachTikRelations(Collection $constRelocationList): void
-    {
-        if ($constRelocationList->isEmpty()) {
-            return;
-        }
-
-        $tikMap = TTik::query()
-            ->whereIn('tik_001', $constRelocationList->pluck('rko_039')->unique()->all())
-            ->whereIn('tik_002', $constRelocationList->pluck('rko_001')->unique()->all())
-            ->get()
-            ->keyBy(fn (TTik $tTik) => $tTik->tik_001 . ':' . $tTik->tik_002);
-
-        $constRelocationList->each(function ($rko) use ($tikMap) {
-            $compositeKey = $rko->rko_039 . ':' . $rko->rko_001;
-            $rko->setRelation('tTik', $tikMap->get($compositeKey));
-        });
     }
 
     protected function options(string $model): array

@@ -168,7 +168,7 @@
                         <x-section-title>移設工事</x-section-title>
                         @if ($showConstRelocation ?? false)
                             <div class="tw:pt-[25px]">
-                                <livewire:main.const-relocation :kNo="$kNo" :tRke="$tRke" />
+                                <livewire:main.const-relocation :requestNumber="$requestNumber" />
                             </div>
                         @endif
                     </div>
