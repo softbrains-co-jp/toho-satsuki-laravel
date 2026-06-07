@@ -15,12 +15,13 @@ use App\Models\MOsuSpeed;
 use App\Models\MPropriety2;
 use App\Models\MReuseImpossible;
 use App\Models\MSpl2Shape;
+use App\Models\VConstProjectInfo;
 use Livewire\Component;
 
 class ConstProjectInfo extends Component
 {
-    public $kNo = null;
-    public $tRke = null;
+    public $requestNumber = null;
+    public $vConstProjectInfo = null;
 
     public $mExistence1Options = [];
     public $mExistence2Options = [];
@@ -35,6 +36,29 @@ class ConstProjectInfo extends Component
     public $mPropriety2Options = [];
     public $mExistence4Options = [];
     public $mConstResultOptions = [];
+
+    private const RELATIONS = [
+        'mKhj020',
+        'mKhj024',
+        'mKhj025',
+        'mRke083',
+        'mRke088',
+        'mRke079',
+        'mRke082',
+        'mRke155',
+        'mRke086',
+        'mRke087',
+        'mRke091',
+        'mRke213',
+        'mRke216',
+        'mRke217',
+        'mRke218',
+        'mRke221',
+        'mRke240',
+        'mKhj010',
+        'mKhj012',
+        'mRke236',
+    ];
 
     public function mount(): void
     {
@@ -102,6 +126,16 @@ class ConstProjectInfo extends Component
             ->orderBy('sort', 'asc')
             ->pluck('val', 'id')
             ->toArray();
+
+        if (!$this->requestNumber) {
+            $this->vConstProjectInfo = null;
+            return;
+        }
+
+        $this->vConstProjectInfo = VConstProjectInfo::query()
+            ->with(self::RELATIONS)
+            ->where('rke_019', $this->requestNumber)
+            ->first();
     }
 
     public function render()

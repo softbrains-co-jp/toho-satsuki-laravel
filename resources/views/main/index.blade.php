@@ -121,7 +121,7 @@
                     <div x-show="isSectionVisible('constProjectInfo')" x-cloak>
                         <x-section-title>工事案件情報（総合）</x-section-title>
                         <div class="tw:pt-[25px]">
-                            <livewire:main.const-project-info :kNo="$kNo" :tRke="$tRke" />
+                            <livewire:main.const-project-info :requestNumber="$requestNumber" />
                         </div>
                     </div>
                     <div x-show="isSectionVisible('constProjectInfo')" x-cloak>
