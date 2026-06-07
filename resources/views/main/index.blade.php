@@ -97,7 +97,7 @@
                     <div>
                         <x-section-title>関連工事情報</x-section-title>
                         <div class="tw:pt-[25px]">
-                            <livewire:main.const-relation-info :kNo="$kNo" />
+                            <livewire:main.const-relation-info :requestNumber="$requestNumber" />
                         </div>
                     </div>
                     <div x-show="isSectionVisible('remarksAggregation')" x-cloak>

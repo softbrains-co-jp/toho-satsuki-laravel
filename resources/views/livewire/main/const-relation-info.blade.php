@@ -7,9 +7,9 @@
                     <td>{{ $vConstRelationInfo?->rke_012 }}</td>
                     <th>回線依頼番号</th>
                     <td><a href="{{ route('main.search-k', ['kNo' => $vConstRelationInfo?->rke_019]) }}">{{ $vConstRelationInfo?->rke_019 }}</a></td>
-                    <th>サービス名称</th>
+                    <th>手配イベント区分</th>
                     <td>{{ $vConstRelationInfo?->rke_006 }}</td>
-                    <th>ISP名称</th>
+                    <th>依頼指示区分</th>
                     <td>{{ $vConstRelationInfo?->rke_009 }}</td>
                 </tr>
             </table>

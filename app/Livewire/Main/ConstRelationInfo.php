@@ -3,23 +3,22 @@
 namespace App\Livewire\Main;
 
 use App\Models\VConstRelationInfo;
-use App\Models\TRke;
 use Livewire\Component;
 
 class ConstRelationInfo extends Component
 {
-    public $kNo = null;
+    public $requestNumber = null;
     public $vConstRelationInfoList = [];
 
     public function mount(): void
     {
-        if (!$this->kNo) {
+        if (!$this->requestNumber) {
             $this->vConstRelationInfoList = [];
             return;
         }
 
-        $rke012 = TRke::query()
-            ->where('rke_019', $this->kNo)
+        $rke012 = VConstRelationInfo::query()
+            ->where('rke_019', $this->requestNumber)
             ->value('rke_012');
 
         if (!$rke012) {
