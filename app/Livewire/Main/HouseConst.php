@@ -20,16 +20,14 @@ use App\Models\MHouseOwnership;
 use App\Models\MHouseStyle;
 use App\Models\MMerchant;
 use App\Models\MRouteChange;
-use App\Models\TKkk;
-use App\Models\TRko;
 use App\Models\MUndecidedDelay;
-use Illuminate\Support\Collection;
+use App\Models\VHouseConst;
 use Livewire\Component;
 
 class HouseConst extends Component
 {
-    public $kNo = null;
-    public $tRke = null;
+    public $requestNumber = null;
+    public $houseConstList = [];
     public $mConstHopeOptions = [];
     public $mHouseStyleOptions = [];
     public $mHouseOwnershipOptions = [];
@@ -50,18 +48,45 @@ class HouseConst extends Component
     public $mDirectReasonOptions = [];
     public $mCodeLength1Options = [];
 
+    private const RELATIONS = [
+        'mRko104',
+        'mRko020',
+        'mRko021',
+        'mRko083',
+        'mRko090',
+        'mRko029',
+        'mRko052',
+        'mRko072',
+        'mRko073',
+        'mRko074',
+        'mRko075',
+        'mRko076',
+        'mKkk005',
+        'mRko051',
+        'mKkk019',
+        'mKkk020',
+        'mRko056',
+        'mKkk011',
+        'mRko077',
+        'mRko067',
+        'mKkk014',
+        'mRko060',
+        'mRko065',
+        'mRko063',
+        'mRko066',
+        'mKkk015',
+    ];
+
     public function mount(): void
     {
         $isToho = auth()->user()->is_toho;
-        $requestNumber = $this->tRke?->rke_019;
         $selectedMerchantIds = [];
 
-        if ($requestNumber) {
-            $houseConstList = $this->houseConstQuery($requestNumber)->get();
-            $this->attachKkkRelations($houseConstList);
+        if ($this->requestNumber) {
+            $this->houseConstList = $this->houseConstQuery($this->requestNumber)->get();
 
-            $selectedMerchantIds = $houseConstList
-                ->map(fn ($rko) => $rko?->tKkk?->kkk_005)
+            $selectedMerchantIds = $this->houseConstList
+                ->pluck('kkk_005')
                 ->filter(fn ($value) => $value !== '')
                 ->unique()
                 ->values()
@@ -175,43 +200,18 @@ class HouseConst extends Component
 
     public function render()
     {
-        $requestNumber = $this->tRke?->rke_019;
-        $houseConstList = collect();
-
-        if (is_string($requestNumber) && $requestNumber !== '') {
-            $houseConstList = $this->houseConstQuery($requestNumber)->get();
-            $this->attachKkkRelations($houseConstList);
-        }
-
         return view('livewire.main.house-const', [
-            'houseConstList' => $houseConstList,
+            'houseConstList' => $this->houseConstList,
         ]);
     }
 
     protected function houseConstQuery(string $requestNumber)
     {
-        return TRko::query()
+        return VHouseConst::query()
+            ->with(self::RELATIONS)
             ->where('rko_039', $requestNumber)
             ->whereIn('rko_041', ['ドロップ引込', '光ID施工'])
             ->where('rko_042', '新設')
             ->orderBy('rko_001', 'asc');
-    }
-
-    protected function attachKkkRelations(Collection $houseConstList): void
-    {
-        if ($houseConstList->isEmpty()) {
-            return;
-        }
-
-        $kkkMap = TKkk::query()
-            ->whereIn('kkk_001', $houseConstList->pluck('rko_039')->unique()->all())
-            ->whereIn('kkk_002', $houseConstList->pluck('rko_001')->unique()->all())
-            ->get()
-            ->keyBy(fn (TKkk $tKkk) => $tKkk->kkk_001 . ':' . $tKkk->kkk_002);
-
-        $houseConstList->each(function ($rko) use ($kkkMap) {
-            $compositeKey = $rko->rko_039 . ':' . $rko->rko_001;
-            $rko->setRelation('tKkk', $kkkMap->get($compositeKey));
-        });
     }
 }

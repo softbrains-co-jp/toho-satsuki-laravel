@@ -144,7 +144,7 @@
                         <x-section-title>宅内工事</x-section-title>
                         @if ($showHouseConst ?? false)
                             <div class="tw:pt-[25px]">
-                                <livewire:main.house-const :kNo="$kNo" :tRke="$tRke" />
+                                <livewire:main.house-const :requestNumber="$requestNumber" />
                             </div>
                         @endif
                     </div>
