@@ -128,7 +128,7 @@
                         <x-section-title>外線工事</x-section-title>
                         @if (($tRke?->rke_019 ?? '') !== '' && ($tRke?->tGkj?->gkj_001 ?? null) === $tRke?->rke_019)
                             <div class="tw:pt-[25px]">
-                                <livewire:main.const-line :kNo="$kNo" :tRke="$tRke" />
+                                <livewire:main.const-line :requestNumber="$requestNumber" />
                             </div>
                         @endif
                     </div>

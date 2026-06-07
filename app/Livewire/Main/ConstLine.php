@@ -5,23 +5,38 @@ namespace App\Livewire\Main;
 use App\Models\MExistence1;
 use App\Models\MMerchant;
 use App\Models\MRouteChange;
+use App\Models\VConstLine;
 use Livewire\Component;
 
 class ConstLine extends Component
 {
-    public $kNo = null;
-    public $tRke = null;
+    public $requestNumber = null;
+    public $vConstLine = null;
     public $mMerchantOptions = [];
     public $mRouteChangeOptions = [];
     public $mExistence1Options = [];
 
+    private const RELATIONS = [
+        'mGkj003',
+        'mGkj007',
+        'mGkj012',
+        'mRke163',
+        'mRke091',
+    ];
+
     public function mount(): void
     {
-        $gkj = $this->tRke?->tGkj;
+        if ($this->requestNumber) {
+            $this->vConstLine = VConstLine::query()
+                ->with(self::RELATIONS)
+                ->where('rke_019', $this->requestNumber)
+                ->first();
+        }
+
         $isToho = auth()->user()->is_toho;
         $selectedMerchantIds = array_values(array_filter([
-            $gkj?->gkj_003,
-            $gkj?->gkj_007,
+            $this->vConstLine?->gkj_003,
+            $this->vConstLine?->gkj_007,
         ]));
 
         $merchantQuery = MMerchant::query()->orderBy('sort', 'asc');
