@@ -91,7 +91,7 @@
                     <div x-show="isSectionVisible('facilityInfo')" x-cloak>
                         <x-section-title>工程進捗情報</x-section-title>
                         <div class="tw:pt-[25px]">
-                            <livewire:main.progress-info :kNo="$kNo" :tRke="$tRke" />
+                            <livewire:main.progress-info :requestNumber="$requestNumber" />
                         </div>
                     </div>
                     <div>
