@@ -160,7 +160,7 @@
                         <x-section-title>かけつけ設定</x-section-title>
                         @if ($showSetupRush ?? false)
                             <div class="tw:pt-[25px]">
-                                <livewire:main.setup-rush :kNo="$kNo" :tRke="$tRke" />
+                                <livewire:main.setup-rush :requestNumber="$requestNumber" />
                             </div>
                         @endif
                     </div>

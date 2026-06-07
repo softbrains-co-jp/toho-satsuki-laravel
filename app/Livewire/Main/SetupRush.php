@@ -30,15 +30,13 @@ use App\Models\MTerminal;
 use App\Models\MUndecidedDelay;
 use App\Models\MUrPrivate;
 use App\Models\MWlanSetupHope;
-use App\Models\TKtk;
-use App\Models\TRkk;
-use Illuminate\Support\Collection;
+use App\Models\VSetupRush;
 use Livewire\Component;
 
 class SetupRush extends Component
 {
-    public $kNo = null;
-    public $tRke = null;
+    public $requestNumber = null;
+    public $setupRushList = [];
 
     public $mConstHopeOptions = [];
     public $mHouseStyleOptions = [];
@@ -69,18 +67,61 @@ class SetupRush extends Component
     public $mOwnerAgreeOptions = [];
     public $mConstSchemeOptions = [];
 
+    private const RELATIONS = [
+        'mRkk104',
+        'mRkk020',
+        'mRkk021',
+        'mRkk083',
+        'mRkk029',
+        'mRkk052',
+        'mRkk072',
+        'mRkk073',
+        'mRkk074',
+        'mRkk075',
+        'mRkk076',
+        'mRkk106',
+        'mRkk107',
+        'mRkk124',
+        'mKtk004',
+        'mRkk051',
+        'mKtk013',
+        'mKtk014',
+        'mRkk056',
+        'mRkk077',
+        'mRkk067',
+        'mRkk155',
+        'mRkk152',
+        'mRkk123',
+        'mRkk133',
+        'mRkk148',
+        'mRkk150',
+        'mRkk231',
+        'mRkk108',
+        'mRkk109',
+        'mRkk114',
+        'mRkk116',
+        'mRkk117',
+        'mRkk118',
+        'mRkk102',
+        'mRkk143',
+        'mRkk196',
+        'mRkk197',
+        'mRkk211',
+        'mRkk212',
+        'mRkk216',
+        'mRkk224',
+    ];
+
     public function mount(): void
     {
         $isToho = auth()->user()->is_toho;
-        $requestNumber = $this->tRke?->rke_019;
         $selectedMerchantIds = [];
 
-        if ($requestNumber) {
-            $setupRushList = $this->setupRushQuery($requestNumber)->get();
-            $this->attachKtkRelations($setupRushList);
+        if ($this->requestNumber) {
+            $this->setupRushList = $this->setupRushQuery($this->requestNumber)->get();
 
-            $selectedMerchantIds = $setupRushList
-                ->map(fn ($rkk) => $rkk?->tKtk?->ktk_004)
+            $selectedMerchantIds = $this->setupRushList
+                ->pluck('ktk_004')
                 ->filter(fn ($value) => $value !== '')
                 ->unique()
                 ->values()
@@ -129,43 +170,18 @@ class SetupRush extends Component
 
     public function render()
     {
-        $requestNumber = $this->tRke?->rke_019;
-        $setupRushList = collect();
-
-        if (is_string($requestNumber) && $requestNumber !== '') {
-            $setupRushList = $this->setupRushQuery($requestNumber)->get();
-            $this->attachKtkRelations($setupRushList);
-        }
-
         return view('livewire.main.setup-rush', [
-            'setupRushList' => $setupRushList,
+            'setupRushList' => $this->setupRushList,
         ]);
     }
 
     protected function setupRushQuery(string $requestNumber)
     {
-        return TRkk::query()
+        return VSetupRush::query()
+            ->with(self::RELATIONS)
             ->where('rkk_039', $requestNumber)
             ->where('rkk_041', 'かけつけ')
             ->orderBy('rkk_001', 'asc');
-    }
-
-    protected function attachKtkRelations(Collection $setupRushList): void
-    {
-        if ($setupRushList->isEmpty()) {
-            return;
-        }
-
-        $ktkMap = TKtk::query()
-            ->whereIn('ktk_001', $setupRushList->pluck('rkk_039')->unique()->all())
-            ->whereIn('ktk_002', $setupRushList->pluck('rkk_001')->unique()->all())
-            ->get()
-            ->keyBy(fn (TKtk $tKtk) => $tKtk->ktk_001 . ':' . $tKtk->ktk_002);
-
-        $setupRushList->each(function ($rkk) use ($ktkMap) {
-            $compositeKey = $rkk->rkk_039 . ':' . $rkk->rkk_001;
-            $rkk->setRelation('tKtk', $ktkMap->get($compositeKey));
-        });
     }
 
     protected function options(string $model): array
